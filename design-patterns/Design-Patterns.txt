@@ -113,7 +113,7 @@ Command:
     from command import Screen,ScreenInvoker, Cutcommand,PasteCommand
     screen = Screen('hello world!')
     screen.__str__()
-    ...
+    ...hello world!
     cut = Cutcommand(screen, start=5,end=11)
     client = ScreenInvoker()
     client.store_and_execute(cut)
@@ -126,7 +126,7 @@ Command:
     client.undo_last()
     client.undo_last()
     screen.__str__()
-    ...hellow world!
+    ...hello world!
 
 State:
 
@@ -141,6 +141,7 @@ State:
     ...Current: suspend => swithc to new state hibernate : not possible
 
 Chain of Responsibility:
+
     from chain import Car, OilHandler, FuelHandler, WaterHandler
     garage_handler = OilHandler(FuelHandler(WaterHandler()))
     car = Car('my car', 1,1,1)
