@@ -1,0 +1,6 @@
+# As of this writing, the stat does not provide the creation time in stat
+# hence need for this simple investigation
+# 3 different ways of getting it
+    - new statx syscall able to retrieve. c program to achieve that
+    - debugfs -R request command for the file
+    - stap (systemtap) to retrieve the same
