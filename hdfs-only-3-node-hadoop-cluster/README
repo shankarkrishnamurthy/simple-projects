@@ -1,0 +1,23 @@
+Setting up larging than life disk size :-)
+------------------------------------------
+1. wget http://apache.cs.utah.edu/hadoop/common/hadoop-3.1.1/hadoop-3.1.1.tar.gz
+2. ssh password-less login enabled amount all workers and master
+3. JAVA installed and JAVA_HOME Setup (look @ conf/hadoop-env.sh)
+        JDIR=$(dirname `readlink -f  /etc/alternatives/java`)
+        export JAVA_HOME=`dirname $JDIR`
+4. create tmp,cache,data,hdfs,logs and conf(copyied from here). Modify IP address appropriately
+
+5. run 
+        . ${HADOOP_HOME}/conf/hadoop-env.sh
+        ${HADOOP_HOME}/sbin/start-dfs.sh
+        (run this only once from master)
+        (make sure java programs for namenodes, datanodes are running in all nodes including master and slaves)
+
+Useful Commands:
+----------------
+    cd $HADOOP_HOME
+    ./bin/hadoop namenode -format (format hdfs)
+    (delete 'data/dfs' if corresponding datanode does not start)
+    ./bin/hadoop fs -ls /
+    ./bin/hadoop fs -copyFromLocal /media/logs/ /
+    ./bin/hdfs dfsadmin -report
