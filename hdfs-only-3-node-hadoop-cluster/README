@@ -6,7 +6,6 @@ Setting up larging than life disk size :-)
         JDIR=$(dirname `readlink -f  /etc/alternatives/java`)
         export JAVA_HOME=`dirname $JDIR`
 4. create tmp,cache,data,hdfs,logs and conf(copyied from here). Modify IP address appropriately
-
 5. run 
         . ${HADOOP_HOME}/conf/hadoop-env.sh
         ${HADOOP_HOME}/sbin/start-dfs.sh
