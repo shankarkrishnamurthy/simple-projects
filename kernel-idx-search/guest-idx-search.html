@@ -51,7 +51,7 @@
 
         // To Get Around CORS problem. 
         // Allow-Origin header not available
-        var url='https://allorigins.me/get?url=' +
+        var url='https://api.allorigins.ml/get?url=' +
             encodeURIComponent(baseurl + linkpath) + '&callback=?';
         $.getJSON(url, onDataRecv);
     })

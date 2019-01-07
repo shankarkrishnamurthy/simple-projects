@@ -103,7 +103,7 @@ def inthandler(signum, frame):
 if __name__ == "__main__":
     thlist = []
     print 'Testing Timer Infra (time=',time.time(),')'
-    constant.nT = 25
+    constant.nT = 6
     constant.tRange = [10,30]
 
     signal.signal(signal.SIGINT, inthandler)
