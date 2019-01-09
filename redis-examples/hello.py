@@ -31,7 +31,7 @@ def hello_redis():
         #r.lpush("pyList", "ever")
         print (r.lrange("pyList",0,r.llen("pyList")))
 
-        r.delete("msg:hello")
+        #r.delete("msg:hello")
         r.delete("foo:01")
         r.delete("key:00")
 
