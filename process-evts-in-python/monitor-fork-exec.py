@@ -44,7 +44,10 @@ def recvevent(evt, buf):
     elif evt == PROC_FORK:
         ph[pev.x] = ph.setdefault(pev.x, 1)
         ph[pev.a] = ph.setdefault(pev.x, 1)
-    #elif evt == PROC_EXEC: pass
+        #os.system("ls -l /proc/%d/exe" % pev.a)
+    elif evt == PROC_EXEC: 
+        #print "Program exec'd pid %d" % pev.x, os.readlink("/proc/%d/exe" % pev.x)
+        pass
     else:
         pass
 
