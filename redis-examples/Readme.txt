@@ -8,3 +8,6 @@ cd simple-projects/redis-examples/
 3. pip3 install -r requirements
 4. docker run -d --name redis-test -p 6379:6379 redis
 5. ./hello.py
+
+Additional notes:
+the pip3 freeze > requirements.txt was used to create this project inside virtualenv
