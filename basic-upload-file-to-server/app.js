@@ -14,8 +14,8 @@ app.post("/upload", function (req, res) {
     var form = new formidable.IncomingForm(), files = [], fields = [];
     //<name> is the value of 'name' attribute in HTML input tag
     form.on('fileBegin', function (name, file) {
-        console.log(file.path + ' -> ' + __dirname + '/uploads/' + file.name + ' vs ' + name);
-        file.path = __dirname + '/uploads/' + file.name;
+        console.log(file.path + ' -> ' + __dirname + '/' + file.name);
+        file.path = __dirname + '/' + file.name;
     });
     form.on('file', function (name, file) {
         console.log('Uploaded ' + file.name + ' : ' + name);
@@ -31,5 +31,4 @@ app.post("/upload", function (req, res) {
     form.parse(req);
 });
 app.listen(port);
-
 
