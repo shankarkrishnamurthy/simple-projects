@@ -1,7 +1,7 @@
 dnsmasq can be used for both DNS resolution AND DHCP server
 ------------------------------------------------------------
 
-For dnsmasq using linux network namespace, refer dnsmasq-in-linux-namespace.sh
+For dnsmasq using linux network namespace, refer <dnsmasq-in-linux-namespace.sh>
 Here dnsmasq is demonstrated using VMs
 
 
