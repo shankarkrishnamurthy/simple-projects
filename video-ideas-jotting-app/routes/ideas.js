@@ -1,35 +1,50 @@
 const express = require('express');
 const route = express.Router();
 const ideaMod = require('../models/idea');
+const {
+    ensureAuthenticated
+} = require('../helpers/auth');
 
-route.get('/add', function (req, res, next) {
+route.get('/add', ensureAuthenticated, function (req, res, next) {
     res.render('ideas/add');
 });
-route.get('/edit/:id', function (req, res, next) {
+route.get('/edit/:id', ensureAuthenticated, function (req, res, next) {
     ideaMod.find({
-            _id: req.params.id
+            _id: req.params.id,
+            user: req.user._id,
         })
         .then(ideas => {
-            res.render('ideas/edit', {
-                idea: ideas[0],
-            });
+            if (ideas.length == 0) {
+                req.flash('error_msg', 'Document not found');
+                res.redirect('/ideas');
+            } else {
+                res.render('ideas/edit', {
+                    idea: ideas[0],
+                });
+            }
         });
 });
 
-route.delete('/:id', (req, res) => {
+route.delete('/:id', ensureAuthenticated, (req, res) => {
     ideaMod.deleteOne({
-            _id: req.params.id
+            _id: req.params.id,
+            user: req.user._id,
+
         })
         .then(idea => {
             req.flash('success_msg', ' Successfully removed');
             res.redirect('/ideas');
-
+        })
+        .catch(err => {
+            req.flash('error_msg', 'Document not found');
+            res.redirect('/ideas');
         });
 });
 
-route.put('/:id', (req, res) => {
+route.put('/:id', ensureAuthenticated, (req, res) => {
     ideaMod.findOne({
-            _id: req.params.id
+            _id: req.params.id,
+            user: req.user._id,
         })
         .then(idea => {
             idea.title = req.body.title;
@@ -38,14 +53,15 @@ route.put('/:id', (req, res) => {
             idea.save()
                 .then(idea => {
                     req.flash('success_msg', ' Successfully edited');
-                    console.log(res.locals)
                     res.redirect('/ideas');
                 });
         });
 });
 
-route.get('/', function (req, res, next) {
-    ideaMod.find({})
+route.get('/', ensureAuthenticated, function (req, res, next) {
+    ideaMod.find({
+            user: req.user._id
+        })
         .sort({
             date: 'desc'
         })
@@ -57,7 +73,7 @@ route.get('/', function (req, res, next) {
 
 });
 
-route.post('/', function (req, res, next) {
+route.post('/', ensureAuthenticated, function (req, res, next) {
     let errors = [];
     if (!req.body.title) {
         errors.push({
@@ -78,7 +94,8 @@ route.post('/', function (req, res, next) {
     } else {
         const nUser = {
             title: req.body.title,
-            details: req.body.details
+            details: req.body.details,
+            user: req.user._id
         };
         new ideaMod(nUser)
             .save()

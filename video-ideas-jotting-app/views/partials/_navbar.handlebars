@@ -14,6 +14,9 @@
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
+                {{#if user}}
+
+
                 <li class="nav-item dropdown">
 
                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" id="navbarDropdownMenuLink">Video Ideas
@@ -23,6 +26,17 @@
                         <a href="/ideas/add" class="dropdown-item">Add Ideas</a>
                     </div>
                 </li>
+                <li class="nav-item">
+                    <a href="/users/logout" class="nav-link">Logout</a>
+                </li>
+                {{else}}
+                <li class="nav-item">
+                    <a href="/users/login" class="nav-link">Login</a>
+                </li>
+                <li>
+                    <a href="/users/register" class="nav-link">Register</a>
+                </li>
+                {{/if}}
             </ul>
         </div>
     </div>
