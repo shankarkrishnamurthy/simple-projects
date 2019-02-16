@@ -9,6 +9,14 @@ Description:
 		- 'authorized javascript origins' : http://localhost:3000
 		- 'Authorized redirect URIs' : http://localhost:3000/auth/google/callback
 
+	- Routes supported:
+		- http://localhost:3000/
+		- http://localhost:3000/auth/google           
+		- http://localhost:3000/auth/google/callback
+		- http://localhost:3000/auth/verify
+		- http://localhost:3000/auth/dashboard
+		- http://localhost:3000/auth/logout
+
 	- output in strategy callback of config/passport.js:
 		- accessToken:
 ya29.GluyBmtqURyqsfo7XFTUCUiXhOduyt0ibxnvuIloLh8sEEfk2mUM3YOga2zp1SGKSkAeODSPEVwwKBQ_KPEwPYIoPqfARvAHxEcA9hDsR9L89uncCClleU0wV3aW
