@@ -8,7 +8,7 @@
 #   Description:
 #       This script returns the next trigger time given an cron expression
 #       To preserve the clarity, only 1st three variable of the expression is considered
-#       But should have any problem extending to others (with minor modification) 
+#       But shouldn't have any problem extending to others (with minor modification) 
 #
 #       valid char: '/', '-', num, '*'
 #           a/b: a is starting and freq is b
@@ -19,6 +19,8 @@
 import time
 import bisect as bi
 class Solution(object):
+    # Input: Expression in String format with quotes ' '
+    # Returns: Tuple (current time, next trigger time). Format is HR MIN SEC
     def __init__(self, p):
         #[s,m,h,D,m,d,y] = p.split(' ')
         w = p.split(' ')
@@ -66,9 +68,10 @@ class Solution(object):
             
         for i,e in enumerate(self.allow):
             next_avail[i] = str(e[next_avail[i]])
-        return (now,'-'.join(next_avail))
+        return ('-'.join(map(str,tl)),'-'.join(next_avail))
             
 
+print Solution('0 12 12 ? * * *').eval()
 print Solution('0 */3 * ? * * *').eval()
 print Solution("10-30 * * ? * * *").eval()
 print Solution("* * 2/4 ? * * *").eval()
