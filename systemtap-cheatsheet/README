@@ -1,0 +1,154 @@
+References:
+-----------
+https://sourceware.org/systemtap/SystemTap_Beginners_Guide/
+https://sourceware.org/systemtap/tutorial/
+https://sourceware.org/systemtap/langref/
+
+install
+-------
+stap-prep
+dnf debuginfo-install <...>
+debuginfo-install <...>     <---- in older yum
+
+* installs into /usr/lib/debug & /usr/src/debug
+* execute stap -L <probe> to see if debug files are visible!
+
+simple handwritten stp script (& my 1st real debugging script):
+--------------------------------------------------------------
+        #!/bin/env stap
+        #
+        global dfi
+
+        probe begin 
+        {
+            printf("Started probing ...\n");
+        }
+
+        probe process("/usr/lib64/libdw.so").function("dwfl_standard_find_debuginfo").call
+        {
+            printf("params=%s\n",$$parms);
+            printf("vars=%s\n",$$vars);
+            printf("fn=%s\n",user_string($file_name));
+            printf("crc=%x\n",$debuglink_crc);
+            dfi = $debuginfo_file_name;
+            printf("ptr=%p %p\n",$file_name,dfi);
+        }
+
+        function helper:long (X:long) %{
+            if ((signed)STAP_ARG_X < 0) { STAP_RETVALUE= -1; }
+            else {STAP_RETVALUE= 1;}
+        %}
+
+        probe process("/usr/lib64/libdw.so").function("dwfl_standard_find_debuginfo").return
+        {
+            rc = returnval()
+            printf("RC %s %d\n", $$return, helper(rc));
+            if (rc < 2147483648) {
+                df = @entry($debuginfo_file_name);
+                printf("cast= %p %p %s\n",df,user_long(df),user_string(user_long(df)));
+            }
+        }
+
+Basics Usage from cmd line:
+---------------------------
+stap -k -v -e 'probe vfs.read {printf("read performed\n"); exit()}'
+stap -v -e 'probe kernel.function("kmem_cache_alloc") { print_backtrace(); exit() }'
+stap -d /bin/ls --ldd -e 'probe process("ls").function("*") {print_usyms(ubacktrace())}' -c "ls /"
+stap  -L 'process("/usr/lib64/libdw.so").function("dwfl_standard_find_debuginfo")'
+stap -d kernel -d i40e -e 'probe module("i40e").function("i40e_xs*") {print_backtrace();printf("%s\n", $$parms);exit()}'
+
+Find which file is used for symbols:
+------------------------------------
+stap -vvv -L <probe point> 2>&1 | grep "focused on module"
+
+using hash/dict:
+----------------
+
+        global reads
+        probe vfs.read
+        {
+          reads[execname(),pid()] ++
+        }
+        probe timer.s(5)
+        {
+          foreach ([a,b] in reads)
+            printf("%s(%d) : %d \n", a,b, reads[a,b])
+          delete reads
+        }
+
+Refer: https://sourceware.org/systemtap/SystemTap_Beginners_Guide/associativearrays.html
+
+Filter by target (PID):
+----------------------
+        my_pid = pid()
+        if (my_pid == target()) {
+        }
+
+        $ sudo stap -x pid ./my.stp
+
+C code can be embedded as embedded C functions. See "Embedded C functions" in SystemTap Language Reference for more details.
+        function <name>[:<type>] ( <arg1>[:<type>], ... ) { <stmts> }
+        function isodd (x) {
+            if (x % 2 == 0) return 0
+            return 1
+        }
+
+        probe begin {
+            for (i = 0; i < 10; i++)
+                if (isodd (i)) printf("%d\n", i)
+        exit()
+        }
+
+Equivalent of 'isodd' in systemtap pure:
+        function isodd:long (X:long) %{
+            if (STAP_ARG_X % 2 == 0) { STAP_RETVALUE= 0; }
+            else {STAP_RETVALUE= 1;}
+        %}
+
+Syntax
+--------
+
+/* in-scope variable var */
+$var
+/* alternative syntax for $varname */
+@var("varname")
+/* the global (either file local or external) variable varname defined when the file src/file.c was compiled */
+@var("varname@src/file.c")
+/* traverses a structures field */
+$var->field
+@var("var@file.c")->field
+/* indexes into an array */
+$var[N]
+@var("var@file.c")[N]
+/* get the address of a variable as a long */
+&$var
+&@var("var@file.c")
+/* provide the address of a particular field or an element in an array */
+&var->field
+&@var("var@file.c")[N]
+/* a string that only includes the values of all basic type values of fields of the variable structure type but not any nested complex type values */
+$var$
+/* a string that also includes all values of nested data types */
+@var("var")$$
+
+Type casting in SystemTap
+-------------------------
+b = @cast(a, "inner_struct")
+b = @cast(a, "inner_struct")->x
+b = @cast($my_var, "outer_struct")->next
+b = &@cast($my_var, "outer_struct")->one
+
+Syntax:
+-------
+process.begin
+process("PATH").begin
+process(PID).begin
+process.thread.begin
+process("PATH").thread.begin
+process(PID).thread.begin
+process.end
+process("PATH").end
+process(PID).end
+process.thread.end
+process("PATH").thread.end
+process(PID).thread.end
