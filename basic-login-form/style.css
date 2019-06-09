@@ -1,0 +1,11 @@
+body {
+    background-color: lightcyan;
+}
+.mycard {
+    background-color: lightskyblue;
+    margin: 5rem;
+    width: 50%;
+}
+.myimg {
+    height: 10rem;
+}
