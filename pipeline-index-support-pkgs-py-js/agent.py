@@ -8,6 +8,7 @@
 from threading import *
 from pprint import pprint
 from datetime import datetime
+from daemon import Daemon
 import os, sys, time
 import tempfile
 import subprocess
@@ -18,11 +19,13 @@ import optparse
 import shutil
 import pickle
 import pipes
+import logging
 
 sys.path.append(os.path.abspath('./py-modules'))
 import requests
 import yaml
 
+conf,debug = {},0
 def PPRINT(a):
     if debug:pprint(a)
 
@@ -51,7 +54,7 @@ class Agent(object):
                 if m: 
                     t = m.group(1)
                     if not t: t=m.group(0)
-                    #print m.groups(),t
+                    #logging.info(m.groups(),t)
                     t=t.replace('.tar.gz','')
                     t=t.replace('.tar.bz2','')
                     t=t.replace('.tgz','')
@@ -68,12 +71,12 @@ class Agent(object):
                 if not os.path.isfile(fi): continue
                 try:
                     if not tarfile.is_tarfile(fi): continue
-                    #print "Opening ", fi
+                    #logging.info("Opening ", fi)
                     a = tarfile.open(fi)
                     n = a.next()
                     n = n.name if n else ""
                     t,pat = matpat(p,n)
-                    #print '2. ',n,' : ', t
+                    #logging.info('2. ',n,' : ', t)
                     if t: 
                         fs[t] = (fi,pat)
                         continue
@@ -81,11 +84,11 @@ class Agent(object):
                     if re.match('SDX',i):
                         for b in a.getnames():
                             t,pat = matpat(p,b)
-                            #print '3. ', b, t
+                            #logging.info('3. ', b, t)
                             if t: 
                                 fs[t] = (fi,pat,b)
                 except:
-                    print "Failed to Parse", fi
+                    logging.info("Failed to Parse %s", fi)
                     continue
                     
         return fs
@@ -101,8 +104,8 @@ class Agent(object):
                 if t: shutil.rmtree(t)
             except: pass
         d = {'SR': sr}
-        #print ' extract ', f
-        #print ' pkg ', pkg
+        #logging.info(' extract %s', f)
+        #logging.info(' pkg %s', pkg)
         d['PKG'] = set()
         d['FILES'] = {}
         for k in pkg.keys():
@@ -123,20 +126,20 @@ class Agent(object):
             cmd = "tar %s %s " % (flg,re.escape(tball))
             for p in f[pat]:
                 cmd +=" --include=%s " % p
-            #print "FindFile: \n", cmd
+            logging.info("FindFile: %s\n", cmd)
             out,err = exec_cmd(cmd)
 
-            #print "Output: ",tball, out.splitlines()
-            #print "Err: ",err.splitlines()
+            logging.info("Output: %s %s",tball, out.splitlines())
+            logging.info("Err: %s",err.splitlines())
             flg = '-xjf' if tball[-3:]=='bz2' else '-xzf'
             for i in out.splitlines():
                 cmd = "tar -O %s %s %s" % (flg, re.escape(tball),i)
-                #print "Extract: \n", cmd
+                logging.info("Extract: %s\n", cmd)
                 out,err = exec_cmd(cmd)
                 if err: 
                     deltemp(t)
                     continue
-                #print "Save content for ", i
+                logging.info("Save content for %s ", i)
                 mz =   100000 # ~ .1 MB
                 if len(out) > mz*2:
                     d['FILES'][i] = out[:mz].decode("utf-8","ignore").encode("utf-8")
@@ -184,14 +187,14 @@ class Agent(object):
         srcnt = 0
         # while True: trigger condition needed! ( *** LATER *** )
         if options.sr:
-            if debug: print 'SR = ', options.sr
+            if debug: logging.info('SR = %s', options.sr)
             if re.search('^\d{8}$', options.sr):
                 if self.checkSR(options.sr, vport):
                     self.signalSR(options.sr)
                     srcnt += 1
 
         elif options.debugfile:
-            if debug: print 'DBG FILE = ', options.debugfile
+            if debug: logging.info('DBG FILE = %s', options.debugfile)
             f = open(options.debugfile, 'r')
             for sr in f:
                 sr = sr.rstrip()
@@ -202,16 +205,15 @@ class Agent(object):
             f.close()
 
         else:
-            if debug: print 'WALK DIR = ', path
+            
+            if debug: logging.info('WALK DIR = %s', path)
             for sr in os.listdir(path):
                 if not re.search('^\d{8}$', sr): continue
                 if self.checkSR(sr,vport): 
                     self.signalSR(sr)   
                     srcnt += 1
-                if srcnt % 100 == 0:
-                    print "Reached: ",srcnt
 
-        print "Total SR processed: ", srcnt
+        logging.info("Total SR processed: %s", srcnt)
         self.done.set()
         self.srQevt.set()
 
@@ -226,9 +228,9 @@ class Agent(object):
             while self.srQ:
                 sr = self.srQ.pop()
                 np = path+'/'+ sr
-                #print 'Processing ... ', np
+                #logging.info('Processing ... ', np)
                 idlist = self.get_all_id(p, np)
-                #print np, idlist
+                #logging.info(np, idlist)
             
                 # extract the content of each files
                 data = self.extract(sr, files, idlist)
@@ -245,10 +247,10 @@ class Agent(object):
             self.dataQevt.clear()
             while self.dataQ:
                 d = self.dataQ.pop()
-                print 'SR ', d['SR']
-                print 'PKG ',d['PKG']
-                print 'Send Data ',d.keys()
-                print 
+                logging.info('SR %s', d['SR'])
+                logging.info('PKG %s',d['PKG'])
+                logging.info('Send Data %s',d.keys())
+                logging.info('')
                 try:
                     d['LAT']=os.path.getatime(path+'/'+d['SR'])
                     d['LMT']=os.path.getmtime(path+'/'+d['SR'])
@@ -258,23 +260,18 @@ class Agent(object):
             if not self.srQ and self.pdone > npthr-1:  break
     
 def die(obj, msg):
-    print msg
-    obj.done.set()
-    obj.srQevt.set()
-    obj.dataQevt.set()
+    logging.info(msg)
+    if obj:
+        obj.done.set()
+        obj.srQevt.set()
+        obj.dataQevt.set()
     sys.exit(1)
 
-if __name__ == "__main__":
-    parser = optparse.OptionParser()
-    parser.add_option('-c','--config', default=False,  help="config file for indexing" )
-    parser.add_option('-d','--debugfile', default=False,  help="file containing SR number" )
-    parser.add_option('--sr', default=False,  help="SR number to process" )
-    parser.add_option('--version', default=1.0, type="float", )
-    options, remainder = parser.parse_args()
-
-    conf,debug = {},0
+def main(obj):
+    logging.basicConfig(filename='/tmp/agent.log',level=logging.INFO,format='%(asctime)s %(message)s')
+    logging.info("Starting the process")
     if options.config: conf["file"] = options.config
-    else: conf['file'] = 'agent.conf'
+    else: conf['file'] = os.path.dirname(obj.invokedir) + '/agent.conf'
     fl = yaml.load(open(conf['file']), Loader=yaml.FullLoader)
     for k in fl.keys():
         if k[0:2] == "x-": 
@@ -302,11 +299,34 @@ if __name__ == "__main__":
     for i in range(npthr): pt[i].start()
     st.start()
 
-
     st.join()
     for i in range(npthr): pt[i].join()
     mt.join()
 
     d2 = datetime.now()
-    print 'days ',(d2-d1).days,'sec ',(d2-d1).seconds,'total secs ',(d2-d1).total_seconds()
+    logging.info('days %s sec %s total secs %s',(d2-d1).days,(d2-d1).seconds,(d2-d1).total_seconds())
+
+class AgentDaemon(Daemon):
+    def __init__(self,pf):
+        Daemon.__init__(self, pf)
+    def run(self):
+        main(self)
+
+if __name__ == "__main__":
+    parser = optparse.OptionParser()
+    parser.add_option('-c','--config', default=False,  help="config file for indexing" )
+    parser.add_option('-d','--debugfile', default=False,  help="file containing SR number" )
+    parser.add_option('--start', default=False, action="store_true",  help="SR " )
+    parser.add_option('--stop', default=False, action="store_true", help="SR " )
+    parser.add_option('--sr', default=False,  help="SR number to process" )
+    parser.add_option('--version', default=1.0, type="float", )
+    options, remainder = parser.parse_args()
+
+    d = AgentDaemon('/tmp/agent.pid')
+    if (not options.start and not options.stop):
+        die(None,"Either stop or start. cannot do none")
+    if options.start: 
+        d.start()
+    else: 
+        d.stop()
 
