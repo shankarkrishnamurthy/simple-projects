@@ -16,6 +16,8 @@ import json
 import tarfile
 import optparse
 import shutil
+import pickle
+import pipes
 
 sys.path.append(os.path.abspath('./py-modules'))
 import requests
@@ -50,9 +52,9 @@ class Agent(object):
                     t = m.group(1)
                     if not t: t=m.group(0)
                     #print m.groups(),t
-                    #t=t.replace('.tar.gz','')
-                    #t=t.replace('.tar.bz2','')
-                    #t=t.replace('.tgz','')
+                    t=t.replace('.tar.gz','')
+                    t=t.replace('.tar.bz2','')
+                    t=t.replace('.tgz','')
                     return t,pat.pattern
             return None,None
 
@@ -102,6 +104,7 @@ class Agent(object):
         #print ' extract ', f
         #print ' pkg ', pkg
         d['PKG'] = set()
+        d['FILES'] = {}
         for k in pkg.keys():
             d.setdefault('PKG', set()).add(k)
             tball,pat,t=pkg[k][0],pkg[k][1],None
@@ -109,7 +112,7 @@ class Agent(object):
             if re.match('SDX', bname) and len(pkg[k]) > 2:
                 fte = pkg[k][2]
                 t = tempfile.mkdtemp()   
-                cmd = "tar -C %s -xzf %s %s" % (t, tball, fte)
+                cmd = "tar -C %s -xzf %s %s" % (t, re.escape(tball), fte)
                 out,err = exec_cmd(cmd)
                 if err: 
                     deltemp(t)
@@ -117,39 +120,57 @@ class Agent(object):
                 tball=t+'/'+fte
 
             flg = '-tjf' if tball[-3:]=='bz2' else '-tzf'
-            cmd = "tar %s %s " % (flg,tball)
+            cmd = "tar %s %s " % (flg,re.escape(tball))
             for p in f[pat]:
                 cmd +=" --include=%s " % p
             #print "FindFile: \n", cmd
             out,err = exec_cmd(cmd)
 
             #print "Output: ",tball, out.splitlines()
+            #print "Err: ",err.splitlines()
             flg = '-xjf' if tball[-3:]=='bz2' else '-xzf'
             for i in out.splitlines():
-                cmd = "tar -O %s %s %s" % (flg, tball,i)
+                cmd = "tar -O %s %s %s" % (flg, re.escape(tball),i)
                 #print "Extract: \n", cmd
                 out,err = exec_cmd(cmd)
                 if err: 
                     deltemp(t)
                     continue
                 #print "Save content for ", i
-                d[i] = out
+                mz =   100000 # ~ .1 MB
+                if len(out) > mz*2:
+                    d['FILES'][i] = out[:mz].decode("utf-8","ignore").encode("utf-8")
+                    d['FILES'][i] += out[-mz:].decode("utf-8","ignore").encode("utf-8")
+                else:
+                    d['FILES'][i] = out[:mz].decode("utf-8","ignore").encode("utf-8")
             deltemp(t)
 
         return d
 
-    def vetSR(self, sr, vport):
-        url = 'http://'+vport+'/vet'
+    def checkSR(self, sr, vport):
+        url = 'http://'+vport+'/check'
         data = { 'SR': sr }
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         try:
             r = requests.post(url, data=json.dumps(data), headers=headers)
         except Exception as e:
-            die(self, "Please restart BackEnd %s " % vport)
+            raise(e)
 
         rsp = r.json()
         PPRINT(rsp)
         return r.status_code == 200 and not rsp['present']
+
+    def saveSR(self,d,vport):
+        url = 'http://'+vport+'/'+d['SR']
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        d['PKG'] = list(d['PKG'])
+        try:
+            r = requests.post(url, data=json.dumps(d), headers=headers)
+        except Exception as e:
+            raise(e)
+
+        rsp = r.json()
+        PPRINT(rsp)
 
     def signalSR(self, sr):
         self.srQ.append(sr)
@@ -160,12 +181,14 @@ class Agent(object):
         self.dataQevt.set()
 
     def MonitorThread(self, path, vport):
+        srcnt = 0
         # while True: trigger condition needed! ( *** LATER *** )
         if options.sr:
             if debug: print 'SR = ', options.sr
             if re.search('^\d{8}$', options.sr):
-                if self.vetSR(options.sr, vport):
+                if self.checkSR(options.sr, vport):
                     self.signalSR(options.sr)
+                    srcnt += 1
 
         elif options.debugfile:
             if debug: print 'DBG FILE = ', options.debugfile
@@ -173,16 +196,22 @@ class Agent(object):
             for sr in f:
                 sr = sr.rstrip()
                 if not re.search('^\d{8}$', sr): continue
-                if self.vetSR(sr,vport): 
+                if self.checkSR(sr,vport): 
                     self.signalSR(sr)   
+                    srcnt += 1
             f.close()
 
         else:
             if debug: print 'WALK DIR = ', path
             for sr in os.listdir(path):
                 if not re.search('^\d{8}$', sr): continue
-                if self.vetSR(sr,vport): self.signalSR(sr)   
+                if self.checkSR(sr,vport): 
+                    self.signalSR(sr)   
+                    srcnt += 1
+                if srcnt % 100 == 0:
+                    print "Reached: ",srcnt
 
+        print "Total SR processed: ", srcnt
         self.done.set()
         self.srQevt.set()
 
@@ -210,7 +239,7 @@ class Agent(object):
             self.pdone += 1
         self.dataQevt.set()
 
-    def SenderThread(self, vport, npthr):
+    def SenderThread(self, vport, npthr,path):
         while True:
             self.dataQevt.wait()
             self.dataQevt.clear()
@@ -220,6 +249,11 @@ class Agent(object):
                 print 'PKG ',d['PKG']
                 print 'Send Data ',d.keys()
                 print 
+                try:
+                    d['LAT']=os.path.getatime(path+'/'+d['SR'])
+                    d['LMT']=os.path.getmtime(path+'/'+d['SR'])
+                except: continue
+                self.saveSR(d,vport)
             
             if not self.srQ and self.pdone > npthr-1:  break
     
@@ -252,15 +286,15 @@ if __name__ == "__main__":
     PPRINT(fl)
     PPRINT(conf)
 
-    agent = Agent()
     pt,npthr =[], 3
+    agent = Agent()
 
     mt = Thread(target=agent.MonitorThread, args=([conf["path"],conf["agentPort"]]))
 
     for i in range(npthr):
         pt.append(Thread(target=agent.ProcessThread, args=([conf["path"],fl])))
 
-    st = Thread(target=agent.SenderThread, args=([conf["agentPort"],npthr]))
+    st = Thread(target=agent.SenderThread, args=([conf["agentPort"],npthr,conf["path"]]))
 
     d1 = datetime.now()
 
