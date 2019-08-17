@@ -1,0 +1,35 @@
+<table class="table table-striped table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">SR #</th>
+
+            <th scope="col">PLATFORMS</th>
+            <th scope="col">BUILDS</th>
+            <th scope="col">PACKAGES</th>
+            <th scope="col">MODIFIED</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each srlist}}
+        <tr>
+            <th scope="row">{{{this.sr}}}</th>
+
+            <td>{{{this.plt}}}</td>
+            <td>{{{this.bld}}}</td>
+            <td>{{{this.pkg}}}</td>
+            <td>{{{this.lmt}}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+<h6 class="d-inline display-6"><i>Total={{total}}</i></h6>
+<div class="float-right">
+    <a href="/list?id={{ps}}-{{pe}}">
+        < </a>
+            {{s}} .. {{e}}
+            <a href="/list?id={{ns}}-{{ne}}">
+                > </a>
+</div>
+<br>
+<br>
+<br>

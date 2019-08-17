@@ -1,0 +1,166 @@
+/*Common Rules*/
+
+#searchtext {
+    display: inline-block;
+    width: 80%;
+    margin-bottom: 1em;
+}
+.jumbotron {
+    padding: 2rem;
+}
+.list-group-item {
+    margin: .5em;
+}
+.btn {
+    padding: .5em 0em;
+}
+hr {
+    height: 2px;
+    background-color: #333;
+    /* Modern Browsers */
+}
+body {
+    overflow-wrap: break-word;
+}
+.imgmore {
+    height: 7%;
+    width: 7%;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+.dropdown {
+    color: black;
+    border-color: #fff;
+    padding: 1rem;
+}
+.dropdown-item:hover {
+    background-color: lightblue;
+}
+[type="text"],
+[type="submit"] {
+    margin-left: 5rem;
+    float: right;
+}
+
+/*
+.btn {
+    padding: .5rem;
+    margin-left: 3rem;
+}
+
+
+.input-group-text {
+    margin-left: 3rem;
+    padding: .6rem;
+}*/
+
+
+/*Tablet rules*/
+
+@media only screen and (max-width: 850px) and (min-width: 501px) {
+    .tasktext {
+        margin-left: 2em;
+        display: inline-block;
+        width: 75%;
+    }
+    .taskgly {
+        font-size: 1.5em;
+        margin-left: .5em;
+        margin-right: .5em;
+        display: inline-block;
+        float: right;
+    }
+    .taskgly:hover {
+        cursor: pointer;
+    }
+    .mycheck {
+        display: block;
+        float: left;
+    }
+}
+
+/* large desktop media */
+
+@media only screen and (min-width: 1201px) {
+    .container {
+        width: 90%;
+    }
+    .tasktext {
+        margin-left: 2em;
+        display: inline-block;
+        width: 85%;
+    }
+    .taskgly {
+        font-size: 1.5em;
+        margin-left: .5em;
+        margin-right: .5em;
+        display: inline-block;
+        float: right;
+    }
+    .taskgly:hover {
+        cursor: pointer;
+    }
+    .mycheck {
+        display: block;
+        float: left;
+    }
+}
+
+/* small Desktop Rules*/
+
+@media only screen and (min-width: 851px) and (max-width: 1200px) {
+    .container {
+        width: 95%;
+    }
+    .tasktext {
+        margin-left: 2em;
+        display: inline-block;
+        width: 85%;
+    }
+    .taskgly {
+        font-size: 1.5em;
+        margin-left: .5em;
+        margin-right: .5em;
+        display: inline-block;
+        float: right;
+    }
+    .taskgly:hover {
+        cursor: pointer;
+    }
+    .mycheck {
+        display: block;
+        float: left;
+    }
+}
+
+/*Mobile Rules*/
+
+@media only screen and (max-width: 500px) {
+    .list-group-item {
+        overflow: auto;
+    }
+    .mycheck {
+        display: inline-block;
+        float: left;
+        width: 1.5em;
+        height: 1.5em;
+        margin-left: 2em;
+    }
+    .tasktext {
+        margin-left: 2em;
+        display: block;
+        float: right;
+        width: 75%;
+    }
+    .taskgly:hover {
+        cursor: pointer;
+    }
+    .taskgly {
+        font-size: 1.5em;
+        margin-top: 1em;
+        display: inline-block;
+        float: left;
+        clear: left;
+    }
+}

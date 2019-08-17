@@ -1,0 +1,21 @@
+<div class="jumbotron">
+    <h1>
+        <center>Support Package Helper</center>
+    </h1>
+</div>
+<form action="/filter" method="POST">
+    <select name="TYPE">
+        {{#each plt}}
+        <option value="{{this}}">{{this}}</option>
+        {{/each}}
+    </select>
+    <select name="MR">
+        {{#each bld}}
+        <option value="{{this}}">{{this}}</option>
+        {{/each}}
+    </select>
+    <input type="submit" value="Submit">
+    <input type="text" name="SR" placeholder="SR #">
+</form>
+<br>
+<hr>
