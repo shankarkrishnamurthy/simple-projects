@@ -415,8 +415,14 @@ function save_sr(req, res) {
     })
 }
 
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 function check_sr(req, res) {
-    const days30 = 10 * 60 * 60 * 24 * 1000;
+    const days10 = 10 * 60 * 60 * 24 * 1000;
     var rsr = req.body['SR'];
     srdb.findOne({
         sr: rsr
@@ -429,7 +435,11 @@ function check_sr(req, res) {
         } else {
             if (srdata) {
                 var diff = Date.now() - srdata['lmt'] * 1000;
-                if (diff > days30) present = 1;
+                // avoid all SR polled at same time
+                var sincelastdb=Date.now()-srdata['date'].getTime()
+                var days30s = getRandomInt(30,40)*60*60*24*1000
+                if (diff > days10 && sincelastdb < days30s) 
+                    present = 1;
             }
         }
         res.send({
