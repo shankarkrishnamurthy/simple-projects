@@ -175,6 +175,15 @@ class Agent(object):
         rsp = r.json()
         PPRINT(rsp)
 
+    def saveLUT(self,vport):
+        url = 'http://'+vport+'/lut'
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        try:
+            r = requests.post(url, headers=headers)
+        except Exception as e:
+            raise(e)
+        rsp = r.json()
+
     def signalSR(self, sr):
         self.srQ.append(sr)
         self.srQevt.set()
@@ -212,6 +221,7 @@ class Agent(object):
                 if self.checkSR(sr,vport): 
                     self.signalSR(sr)   
                     srcnt += 1
+            self.saveLUT(vport)
 
         logging.info("Total SR processed: %s", srcnt)
         self.done.set()
@@ -304,7 +314,10 @@ def main(obj):
     mt.join()
 
     d2 = datetime.now()
-    logging.info('days %s sec %s total secs %s',(d2-d1).days,(d2-d1).seconds,(d2-d1).total_seconds())
+    logging.info('days %s hr %d min %d sec %d total secs %s',\
+            (d2-d1).days,\
+            (d2-d1).seconds/3600,((d2-d1).seconds%3600)/60, ((d2-d1).seconds%3600) % 60,\
+            (d2-d1).total_seconds())
 
 class AgentDaemon(Daemon):
     def __init__(self,pf):
