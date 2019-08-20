@@ -65,8 +65,11 @@ app.use(bodyParser.json({
 app.use(express.static(path.join(__dirname, '/public')));
 
 var port = process.env.PORT || 2567;
+var lut;
 
 app.route('/').get(home);
+app.route('/lut').post(lutime);
+app.route('/lut').get(lutime);
 app.route('/list').get(list_sr);
 app.route('/filter').post(filter_sr);
 app.route('/check').post(check_sr);
@@ -149,9 +152,19 @@ function processdata(x) {
 }
 
 function dateformat(m) {
-    return new Date(m * 1000).toISOString().
-    replace(/T/, ' ').
-    replace(/\..+/, '');
+    if (m)
+        return new Date(m * 1000).toISOString().
+    replace(/T/, ' ').replace(/\..+/, '');
+    else
+        return 'null';
+}
+
+function lutime(req, res) {
+    lut = Date.now() / 1000;
+    //console.log(lut);
+    res.send({
+        res: 'ok'
+    })
 }
 
 function pkglist(m) {
@@ -211,6 +224,7 @@ function index(req, res, srl) {
     var q = req.query;
     var s = 0,
         e = 10;
+
     if (q && 'id' in q) {
         [s, e] = q['id'].split('-');
         s = parseInt(s);
@@ -251,12 +265,12 @@ function render_srl(req, res, srs, n, s, e, ty) {
         ne = n;
         ns = Math.max(0, n - 1)
     }
-
     res.render(ty, {
         plt: ["PLATFORM TYPE", "SDX", "MPX", "VPX", "MISC"],
         bld: ["MR BUILD", "10.1", "10.5", "11.0", "11.1", "12.0", "12.1", "13.0"],
         srlist: srs,
         total: n,
+        lut: dateformat(lut),
         s: s,
         e: e,
         pe: pe,
@@ -416,9 +430,9 @@ function save_sr(req, res) {
 }
 
 function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
 }
 
 function check_sr(req, res) {
@@ -436,9 +450,9 @@ function check_sr(req, res) {
             if (srdata) {
                 var diff = Date.now() - srdata['lmt'] * 1000;
                 // avoid all SR polled at same time
-                var sincelastdb=Date.now()-srdata['date'].getTime()
-                var days30s = getRandomInt(30,40)*60*60*24*1000
-                if (diff > days10 && sincelastdb < days30s) 
+                var sincelastdb = Date.now() - srdata['date'].getTime()
+                var days30s = getRandomInt(30, 40) * 60 * 60 * 24 * 1000
+                if (diff > days10 && sincelastdb < days30s)
                     present = 1;
             }
         }
