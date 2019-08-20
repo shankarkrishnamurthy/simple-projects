@@ -266,7 +266,7 @@ function render_srl(req, res, srs, n, s, e, ty) {
         ns = Math.max(0, n - 1)
     }
     res.render(ty, {
-        plt: ["PLATFORM TYPE", "SDX", "MPX", "VPX", "MISC"],
+        plt: ["PLATFORM TYPE", "SDX", "MPX", "VPX", "VPX (NON-SDX)", "MISC"],
         bld: ["MR BUILD", "10.1", "10.5", "11.0", "11.1", "12.0", "12.1", "13.0"],
         srlist: srs,
         total: n,
@@ -287,14 +287,16 @@ function isEmpty(obj) {
 
 function filter(req, res, srl) {
     var b = req.body
-    var validplt = ["SDX", "MPX", "VPX", "MISC", "Virtual"];
+    var validplt = ["SDX", "MPX", "VPX", "VPX (NON-SDX)", "MISC", "Virtual"];
     var validbld = ["10.1", "10.5", "11.0", "11.1", "12.0", "12.1", "13.0"];
     if (!(validplt.includes(b["TYPE"]) ||
             validbld.includes(b["MR"]))) res.redirect('/');
     var sri = []
     if (validplt.includes(b["TYPE"])) {
-        if (b['TYPE'] == 'VPX') b['TYPE'] = 'Virtual';
-        var re = new RegExp(b['TYPE'], 'g');
+        var srchpat = b['TYPE']
+        var nonsdx = (srchpat.includes('NON-SDX')) ? true : false;
+        if (b['TYPE'].includes('VPX')) srchpat = 'Virtual';
+        var re = new RegExp(srchpat, 'g');
         for (var i = 0; i < srl.length; i++) {
             var plt = pltlist(srl[i]['P']);
             var f = false;
@@ -302,7 +304,10 @@ function filter(req, res, srl) {
                 if (!isEmpty(srl[i]['P']) && !(plt.match(/SDX|MPX|Virtual/)))
                     f = true;
             } else {
-                if (plt.match(re)) f = true;
+                if (plt.match(re)) {
+                    if (!(nonsdx && plt.match('SDX')))
+                        f = true;
+                }
             }
             if (!f) continue;
             sri.push(i);
