@@ -4,6 +4,7 @@ const exphbs = require('express-handlebars')
 const bodyParser = require('body-parser');
 const path = require('path');
 const mongoose = require('mongoose');
+const J = require('jira-client');
 const Schema = mongoose.Schema;
 
 mongoose.Promise = global.Promise;
@@ -37,7 +38,10 @@ const srSchema = new Schema({
     plt: {
         type: String,
     },
-    form: {
+    jiraid: {
+        type: String,
+    },
+    cname: {
         type: String,
     },
     files: {}, // raw data
@@ -149,6 +153,40 @@ function processdata(x) {
             console.log('Unknown ' + f);
         }
     }
+}
+
+function updatejira(d, srdb) {
+    var j = new J({
+        protocol: 'https',
+        host: 'issues.citrite.net',
+        username: 'svcacct_jira_odsbo',
+        password: 'eCr7!wSg8%lKj7!M'
+    });
+    var qstr = "project=NSHELP AND cf[20330] ~ " + d.sr
+    var qopt = {
+        maxResults: 10,
+        fields: ['key', 'customfield_13930', 'customfield_20330'],
+    };
+    j.searchJira(qstr, qopt)
+        .then((idl) => {
+            d.jiraid = ''
+            d.cname = ''
+            for (i in idl.issues) {
+                d.jiraid += ((i == 0) ? '' : ',') + idl.issues[i].key
+                d.cname += ((i == 0) ? '' : ',') + idl.issues[i].fields.customfield_13930
+            }
+            //console.log(idl);
+            srdb.updateOne({
+                sr: d.sr
+            }, {
+                jiraid: d.jiraid,
+                cname: d.cname
+            }, {
+                upsert: true
+            }, (err, d) => {
+                if (err) console.log('Err: ' + err);
+            })
+        })
 }
 
 function dateformat(m) {
@@ -290,7 +328,10 @@ function filter(req, res, srl) {
     var validplt = ["SDX", "MPX", "VPX", "VPX (NON-SDX)", "MISC", "Virtual"];
     var validbld = ["10.1", "10.5", "11.0", "11.1", "12.0", "12.1", "13.0"];
     if (!(validplt.includes(b["TYPE"]) ||
-            validbld.includes(b["MR"]))) res.redirect('/');
+            validbld.includes(b["MR"]))) {
+        res.redirect('/');
+        return
+    }
     var sri = []
     if (validplt.includes(b["TYPE"])) {
         var srchpat = b['TYPE']
@@ -421,6 +462,7 @@ function save_sr(req, res) {
     };
     data.date = new Date(Date.now())
     processdata(data)
+    updatejira(data, srdb)
     srdb.updateOne({
         sr: req.params.sr
     }, data, {
