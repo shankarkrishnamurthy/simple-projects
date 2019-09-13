@@ -205,6 +205,31 @@ function lutime(req, res) {
     })
 }
 
+function combine(s1, s2) {
+    var spat = '<b>.*?</b>'
+    var vpat = '<i>.*?</i>'
+    var re = new RegExp(spat, 'g')
+    var re1 = new RegExp(vpat, 'g')
+    var h = {}
+    s1 = s1.replace(/\n/g, "")
+    s2 = s2.replace(/\n/g, "")
+    var k = s1.match(re)
+    var v = s1.match(re1)
+    for (var i in k) {
+        h[k[i]] = v[i]
+    }
+    k = s2.match(re)
+    v = s2.match(re1)
+    for (var i in k) {
+        if (k[i] in h) {
+            h[k[i]] += ';' + v[i]
+        } else {
+            h[k[i]] = v[i]
+        }
+    }
+    return Object.entries(h).join(',')
+}
+
 function pkglist(m) {
     var pkgstr = '';
     m.forEach((i) => {
@@ -222,13 +247,13 @@ function bldlist(p) {
             var m = p[k].match(/SDX_PLATFORM_SBI=.*/)
             if (m) tv = m[0];
             else tv = 'Legacy Build';
-            tt = '<div data-toggle="tooltip" data-html="true" title="' + tt + '">' + tv + '</div>'
-            bldlist += '<b>' + k + ':</b>' + tt;
+            tt = '<span data-toggle="tooltip" data-html="true" title="' + tt + '">' + tv + '</span>'
+            bldlist += '<b>' + k + ':</b>' + '<i>' + tt + '</i>';
         } else {
             var m = p[k].match(/\n.*build.*/i);
             if (m) {
                 var cont = m[0].replace(/\/flash\//, '').replace(/, Date.*/, '')
-                bldlist += '<b>' + k + ':</b> ' + cont + '<br>';
+                bldlist += '<b>' + k + ':</b> ' + '<i>' + cont + '</i>' + '<br>';
             }
         }
     }
@@ -244,11 +269,12 @@ function pltlist(p) {
             var m = p[k].match(/product name.*/i)
             if (m) tv = m[0]
             else tv = "dmidecode missing (hover here)"
-            tt = '<div data-toggle="tooltip" data-html="true" title="' + tt + '">' + tv + '</div>'
-            pltlist += '<b>' + k + ':</b>' + tt;
+            tt = '<span data-toggle="tooltip" data-html="true" title="' + tt + '">' + tv + '</span>'
+            pltlist += '<b>' + k + ':</b>' + '<i>' + tt + '</i>';
         } else {
             var m = p[k].match(/.*\n/);
-            if (m) pltlist += '<b>' + k + ':</b> ' + m[0] + '<br>';
+            if (m)
+                pltlist += '<b>' + k + ':</b> ' + '<i>' + m[0] + '</i>' + '<br>';
         }
     }
     return pltlist;
@@ -275,13 +301,18 @@ function index(req, res, srl) {
     var srlist = []; //console.log(' s '+s + ' e '+ e);
     for (var i = s; i < e; i++) {
         var sre = srl[i];
+        var bld = bldlist(sre['P'])
+        var plt = pltlist(sre['P'])
         var tmp = {}
         tmp = {
             sr: annosr(sre['sr']),
             lmt: dateformat(sre['lmt']),
             pkg: pkglist(sre['pkg']),
-            bld: bldlist(sre['P']),
-            plt: pltlist(sre['P']),
+            bld: bld,
+            plt: plt,
+            bp: combine(plt, bld),
+            jid: sre['jiraid'],
+            cn: sre['cname'],
         };
         srlist.push(tmp)
     }
@@ -328,10 +359,19 @@ function filter(req, res, srl) {
     var validplt = ["SDX", "MPX", "VPX", "VPX (NON-SDX)", "MISC", "Virtual"];
     var validbld = ["10.1", "10.5", "11.0", "11.1", "12.0", "12.1", "13.0"];
     if (!(validplt.includes(b["TYPE"]) ||
-            validbld.includes(b["MR"]))) {
+            validbld.includes(b["MR"])) && !('JIRA' in b)) {
         res.redirect('/');
         return
     }
+
+    if ('JIRA' in b) {
+        for (var i = srl.length - 1; i >= 0; i--) {
+            if (!('jiraid' in srl[i] && srl[i]['jiraid'].length > 0)) {
+                srl.splice(i, 1);
+            }
+        }
+    }
+
     var sri = []
     if (validplt.includes(b["TYPE"])) {
         var srchpat = b['TYPE']
@@ -373,16 +413,25 @@ function filter(req, res, srl) {
             }
         }
     }
-    //console.log(' bld len ' + sri.length)
+    if (!(validplt.includes(b["TYPE"]) ||
+            validbld.includes(b["MR"]))) {
+        sri = Array.from(Array(srl.length).keys())
+    }
+
     var srfl = []
     for (var i = 0; i < sri.length; i++) {
         var sre = srl[sri[i]];
+        var bld = bldlist(sre['P'])
+        var plt = pltlist(sre['P'])
         var tmp = {
             sr: annosr(sre['sr']),
             lmt: dateformat(sre['lmt']),
             pkg: pkglist(sre['pkg']),
-            bld: bldlist(sre['P']),
-            plt: pltlist(sre['P']),
+            bld: bld,
+            plt: plt,
+            bp: combine(plt, bld),
+            jid: sre['jiraid'],
+            cn: sre['cname'],
         };
         srfl.push(tmp);
     }
@@ -402,7 +451,9 @@ function filter_sr(req, res) {
                 sr: 1,
                 P: 1,
                 pkg: 1,
-                lmt: 1
+                lmt: 1,
+                jiraid: 1,
+                cname: 1,
             }, {
                 lean: true
             })
@@ -419,7 +470,9 @@ function list_sr(req, res) {
             sr: 1,
             P: 1,
             pkg: 1,
-            lmt: 1
+            lmt: 1,
+            jiraid: 1,
+            cname: 1,
         }, {
             lean: true
         })

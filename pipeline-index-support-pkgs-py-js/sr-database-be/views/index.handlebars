@@ -3,8 +3,8 @@
         <tr>
             <th scope="col">SR #</th>
 
-            <th scope="col">PLATFORMS</th>
-            <th scope="col">BUILDS</th>
+            <th scope="col">PLATFORMS/BUILDS</th>
+            <th scope="col">JIRA/CUSTOMER</th>
             <th scope="col">PACKAGES</th>
             <th scope="col">MODIFIED</th>
         </tr>
@@ -13,9 +13,8 @@
         {{#each srlist}}
         <tr>
             <th scope="row">{{{this.sr}}}</th>
-
-            <td>{{{this.plt}}}</td>
-            <td>{{{this.bld}}}</td>
+            <td>{{{this.bp}}}</td>
+            <td><b>{{{this.jid}}}</b><br><i>{{{this.cn}}}</i> </td>
             <td>{{{this.pkg}}}</td>
             <td>{{{this.lmt}}}</td>
         </tr>
