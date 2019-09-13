@@ -68,15 +68,15 @@ class Agent(object):
             
             for i in f:
                 fi = r+'/'+i
+                #logging.info("Opening %s", fi)
                 if not os.path.isfile(fi): continue
                 try:
                     if not tarfile.is_tarfile(fi): continue
-                    #logging.info("Opening ", fi)
                     a = tarfile.open(fi)
                     n = a.next()
                     n = n.name if n else ""
                     t,pat = matpat(p,n)
-                    #logging.info('2. ',n,' : ', t)
+                    #logging.info('2. %s : %s',n, t)
                     if t: 
                         fs[t] = (fi,pat)
                         continue
@@ -126,20 +126,20 @@ class Agent(object):
             cmd = "tar %s %s " % (flg,re.escape(tball))
             for p in f[pat]:
                 cmd +=" --include=%s " % p
-            logging.info("FindFile: %s\n", cmd)
+            #logging.info("FindFile: %s\n", cmd)
             out,err = exec_cmd(cmd)
 
-            logging.info("Output: %s %s",tball, out.splitlines())
-            logging.info("Err: %s",err.splitlines())
+            #logging.info("Output: %s %s",tball, out.splitlines())
+            #logging.info("Err: %s",err.splitlines())
             flg = '-xjf' if tball[-3:]=='bz2' else '-xzf'
             for i in out.splitlines():
                 cmd = "tar -O %s %s %s" % (flg, re.escape(tball),i)
-                logging.info("Extract: %s\n", cmd)
+                #logging.info("Extract: %s\n", cmd)
                 out,err = exec_cmd(cmd)
                 if err: 
                     deltemp(t)
                     continue
-                logging.info("Save content for %s ", i)
+                #logging.info("Save content for %s ", i)
                 mz =   100000 # ~ .1 MB
                 if len(out) > mz*2:
                     d['FILES'][i] = out[:mz].decode("utf-8","ignore").encode("utf-8")
@@ -238,9 +238,9 @@ class Agent(object):
             while self.srQ:
                 sr = self.srQ.pop()
                 np = path+'/'+ sr
-                #logging.info('Processing ... ', np)
+                #logging.info('Processing ... %s', np)
                 idlist = self.get_all_id(p, np)
-                #logging.info(np, idlist)
+                #logging.info("%s %s",np, idlist)
             
                 # extract the content of each files
                 data = self.extract(sr, files, idlist)
@@ -257,10 +257,10 @@ class Agent(object):
             self.dataQevt.clear()
             while self.dataQ:
                 d = self.dataQ.pop()
-                logging.info('SR %s', d['SR'])
-                logging.info('PKG %s',d['PKG'])
-                logging.info('Send Data %s',d.keys())
-                logging.info('')
+                #logging.info('SR %s', d['SR'])
+                #logging.info('PKG %s',d['PKG'])
+                #logging.info('Send Data %s',d.keys())
+                #logging.info('')
                 try:
                     d['LAT']=os.path.getatime(path+'/'+d['SR'])
                     d['LMT']=os.path.getmtime(path+'/'+d['SR'])
@@ -314,7 +314,7 @@ def main(obj):
     mt.join()
 
     d2 = datetime.now()
-    logging.info('days %s hr %d min %d sec %d total secs %s',\
+    logging.info('%d days %d hr %d min %d sec %d total secs',\
             (d2-d1).days,\
             (d2-d1).seconds/3600,((d2-d1).seconds%3600)/60, ((d2-d1).seconds%3600) % 60,\
             (d2-d1).total_seconds())
@@ -336,10 +336,12 @@ if __name__ == "__main__":
     options, remainder = parser.parse_args()
 
     d = AgentDaemon('/tmp/agent.pid')
-    if (not options.start and not options.stop):
-        die(None,"Either stop or start. cannot do none")
+
     if options.start: 
         d.start()
-    else: 
+    elif options.stop: 
         d.stop()
+    else:
+        d.invokedir = os.path.abspath(__file__)
+        main(d)
 
