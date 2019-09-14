@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+     SDX (Netscaler) Platform Definition
+     Platform: Abacus - Two Socket 1 CPU, 4 DISK and 2 Mgmnt interface
+-->
+<SDX>
+    <HARDWARE DMIDECODEID="75" VPXDMIID="88" SYSID="520100" VPXSYSID="450093" SYSFAMILY="520xx">
+        <CPU>
+            <SOCKET>2</SOCKET>
+            <CORES>14</CORES>
+            <HYPER-THREADS>56</HYPER-THREADS>
+            <LAPIC_FREQ>0x0000000002faf750ULL</LAPIC_FREQ>
+            <TSC_FREQ>0x000000008F0D1800ULL</TSC_FREQ>
+        </CPU>
+        <MEMORY>256</MEMORY> <!-- Unit GB -->
+        <NICS>
+		<INTF_AFFI SOCKET="0">"100/1,100/2,100/3,100/4,100/5,100/6,100/7,100/8"</INTF_AFFI>
+            <ETH>
+                <INTERFACE name="0/1" type="igb" max_vfs="0">"eth0"</INTERFACE>
+                <INTERFACE name="0/2" type="igb" max_vfs="0">"eth1"</INTERFACE>
+                <INTERFACE name="100/1" type="mce" max_vfs="63">"eth6"</INTERFACE>
+                <INTERFACE name="100/2" type="mce" max_vfs="63">"eth7"</INTERFACE>
+                <INTERFACE name="100/3" type="mce" max_vfs="63">"eth8"</INTERFACE>
+                <INTERFACE name="100/4" type="mce" max_vfs="63">"eth9"</INTERFACE>
+                <INTERFACE name="100/5" type="mce" max_vfs="63">"eth4"</INTERFACE>
+                <INTERFACE name="100/6" type="mce" max_vfs="63">"eth5"</INTERFACE>
+                <INTERFACE name="100/7" type="mce" max_vfs="63">"eth2"</INTERFACE>
+                <INTERFACE name="100/8" type="mce" max_vfs="63">"eth3"</INTERFACE>
+            </ETH>
+        </NICS>
+        <MGMT_INTFS>eth0 eth1</MGMT_INTFS>
+        <SSL_CHIPS>4</SSL_CHIPS>
+        <SSL_VFS_PER_CHIP>32</SSL_VFS_PER_CHIP>
+        <DISKS>
+            <DISKSLOT1>/sys/devices/pci0000:00/0000:00:1f.2/ata*/host*/target*/4*/block/* /sys/devices/pci0000:00/0000:00:1f.2/ata*/host*/target*/5*/block/*</DISKSLOT1>
+	    <DISKDEVICE1>/dev/md_d0p4</DISKDEVICE1>
+	    <DISKNAME1>Local storage</DISKNAME1>
+
+            <DISKSLOT2>/sys/devices/pci0000:00/0000:00:11.4/ata*/host*/target*/0*/block/* /sys/devices/pci0000:00/0000:00:11.4/ata*/host*/target*/2*/block/*</DISKSLOT2>
+            <DISKDEVICE2>/dev/md_d1</DISKDEVICE2>
+            <DISKNAME2>VPX-SR</DISKNAME2>
+
+	    <DISKSLOT3>/sys/devices/pci0000:00/0000:00:11.4/ata*/host*/target*/1*/block/* /sys/devices/pci0000:00/0000:00:11.4/ata*/host*/target*/3*/block/*</DISKSLOT3>
+            <DISKDEVICE3>/dev/md_d2</DISKDEVICE3>
+            <DISKNAME3>VPX-SR-2</DISKNAME3>
+
+	    <DISKSLOT4>/sys/devices/pci0000:00/0000:00:1f.2/ata*/host*/target*/6*/block/* /sys/devices/pci0000:00/0000:00:1f.2/ata*/host*/target*/7*/block/*</DISKSLOT4>
+            <DISKDEVICE4>/dev/md_d3</DISKDEVICE4>
+            <DISKNAME4>VPX-SR-3</DISKNAME4>
+
+        </DISKS>
+        <BAYINFO>sata:4 sata:5 sata:6 sata:7 sata:0 sata:1 sata:2 sata:3</BAYINFO>
+    </HARDWARE>
+
+<!-- SVM -->
+    <IS_VLAN_STRIPPING>1</IS_VLAN_STRIPPING>
+    <INTERFACES_HAVE_CPU_AFFINITY>1</INTERFACES_HAVE_CPU_AFFINITY>
+    <UPDATE_LCD_ARGS>"/dev/ttyUSB0"</UPDATE_LCD_ARGS>
+    <INTF_CPU_AFFI>1</INTF_CPU_AFFI> <!-- Affi b/w socket intf -->
+    <CONTAINS_CAVIUM>0</CONTAINS_CAVIUM>
+    <CONTAINS_COLETO>1</CONTAINS_COLETO>
+    <CONTAINS_FORTVILLE>0</CONTAINS_FORTVILLE>
+    <CAVIUM_VF_TO_ACU_X>10</CAVIUM_VF_TO_ACU_X>
+    <CAVIUM_VF_TO_SCU_X>10</CAVIUM_VF_TO_SCU_X>
+    <FIPS_PARTITION>0</FIPS_PARTITION>
+    <HAS_ONLY_LOCAL_STORAGE>0</HAS_ONLY_LOCAL_STORAGE>
+	<MNX_DRIVER>1</MNX_DRIVER>
+    <IS_NEXT_GEN>1</IS_NEXT_GEN>
+    <USE_NEW_CORE_ALLOCATION_LOGIC>1</USE_NEW_CORE_ALLOCATION_LOGIC>
+    <MAX_CORES_PER_VM>26</MAX_CORES_PER_VM>
+    <MAX_VMS_PER_CORE>6</MAX_VMS_PER_CORE>
+    <NIC_XAPI_PLUGIN>"false"</NIC_XAPI_PLUGIN>
+
+    <PLAT_MAX_INST>115</PLAT_MAX_INST>
+    <PLAT_NAME>"ABACUS"</PLAT_NAME>
+    <ACTIVE>1</ACTIVE>
+
+    <DEV_FILE_NAME>"./.ABACUS"</DEV_FILE_NAME>
+    <NICK_NAME>Abacus</NICK_NAME> <!-- may be Used as Variable -->
+    <PCIBACK_HIDE>(00:11.4)</PCIBACK_HIDE>
+    <!-- <DISKASSEMBLE>sde sdf</DISKASSEMBLE> -->
+    <LICENSE> 
+        <NAME ID="0" T="0" I="0">"26000-100G"</NAME>
+        <NAME ID="26100" T="100000.0" I="20">"26100-100G"</NAME>
+        <NAME ID="26160" T="160000.0" I="70">"26160-100G"</NAME>
+        <NAME ID="26200" T="200000.0" I="115">"26200-100G"</NAME>
+        <NAME ID="26250" T="250000.0" I="115">"26250-100G"</NAME>
+    </LICENSE>
+
+    <DATA_INTF>"100/1,100/2,100/3,100/4,100/5,100/6,100/7,100/8"</DATA_INTF>
+    <MGMT_INTF>"0/1,0/2"</MGMT_INTF>
+        <THREADS_LAYOUT>"11111111111111111111111111110000000000000000000000000000"</THREADS_LAYOUT>
+	<PRIMARY_RESERVED_THREADS>"10000000000000000000000000001000000000000000000000000000"</PRIMARY_RESERVED_THREADS>
+	<ADJOINING_RESERVED_THREADS>"01000000000000000000000000000100000000000000000000000000"</ADJOINING_RESERVED_THREADS>
+	<THREADS_AVAILABLE_FOR_VM>"00111111111111111111111111110011111111111111111111111111"</THREADS_AVAILABLE_FOR_VM>
+	<ADJOINING_THREADS>"1,0,3,2,5,4,7,6,9,8,11,10,13,12,15,14,17,16,19,18,21,20,23,22,25,24,27,26,29,28,31,30,33,32,35,34,37,36,39,38,41,40,43,42,45,44,47,46,49,48,51,50,53,52,55,54"</ADJOINING_THREADS>
+
+    <!-- 
+         Disk allocation methods are: 
+         "ram_based_20_40GB": 20GB if memory>4GB and 40GB if memory>10GB. For gladius.
+         "ram_based_42_82GB": 42GB if memory>4GB and 82GB if memory>10GB. This is default method.
+         "rome_based_40GB": 40GB if core>1. For ROME
+    -->
+    <SECONDARY_DISK_ALLOCATION_METHOD>"ram_based_42_82GB"</SECONDARY_DISK_ALLOCATION_METHOD>
+    <SVM_VCPU_AFFINITY>55</SVM_VCPU_AFFINITY>
+    <FEATURE>
+        <L2MODE>1</L2MODE>
+        <RAID>1</RAID>
+        <SWRAID>1</SWRAID>
+    </FEATURE>
+
+    <!-- 
+         These actions are performed @ post install time. 
+         Given in the bash command format used in postinst.sh
+    -->
+    <POSTINSTALL>
+	<BASH_ACTIONS>
+	echo "options igb max_vfs=0,0 XSNSMode=0,0 XSNSVLANFiltering=0,0" > /etc/modprobe.d/igb
+	ln -s /etc/modprobe.d/igb /etc/modprobe.d/igb.conf
+	echo "options i40e max_vfs=32,32,32,32,32,32,32,32,32,32 XSNSMode=1,1,1,1,1,1,1,1,1,1 XSNSVLANFiltering=1,1,1,1,1,1,1,1,1,1" > /etc/modprobe.d/i40e
+	ln -s /etc/modprobe.d/i40e /etc/modprobe.d/i40e.conf
+	echo "options mlx5_core  XSNSMode=1,1,1,1,1,1,1,1 debug_mask=0x40000008 XSNSFwRange=12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010 XSNSVLANFiltering=1,1,1,1,1,1,1,1 max_vfs=63,63,63,63,63,63,63,63" > /etc/modprobe.d/mlx5_core.conf
+	/opt/xensource/libexec/xen-cmdline --set-xen "dom0_mem=16384M,max:16384M"
+	/opt/xensource/libexec/xen-cmdline --set-xen "dom0_max_vcpus=1-8"
+	/opt/xensource/libexec/xen-cmdline --set-xen "extra_guest_irqs=40,512"
+	/opt/xensource/libexec/xen-cmdline --set-xen "x2apic_phys=true"
+	/opt/xensource/libexec/xen-cmdline --set-xen "nmi=fatal"
+	/opt/xensource/libexec/xen-cmdline --set-dom0 "vmalloc=192M"
+	/opt/xensource/libexec/xen-cmdline --set-dom0 log_buf_len=2M
+	echo "POLICY_DYN=max" > /var/lib/xen/tune-vcpus-policy
+	echo "Creating /var/lib/xen/tune-vcpus-policy file for Dom0 vcpus"
+	mdadm --examine --scan > /etc/mdadm.conf
+	/opt/xensource/bin/setup_if_srules.py
+	/opt/xensource/bin/setup_pass_pif_state.sh
+	/opt/xensource/libexec/xen-cmdline --set-dom0 rd.driver.blacklist=i40e,mlx5_core,mlx5_en
+        </BASH_ACTIONS>
+    </POSTINSTALL>
+    <!-- 
+         These are commands executed for Platform Display.
+         Given in the bash command format used in svminst.sh
+    -->
+    <LCD>
+        <BASH_ACTIONS>
+        /bin/stty -F /dev/ttyUSB0 19200
+		sleep 1
+        echo -e -n $(echo -e -n /kA= | base64 -d)"     CITRIX     ""NSSDX-26000-100G" > /dev/ttyUSB0
+		sleep 2
+		echo -e -n $(echo -e -n /lg= | base64 -d) > /dev/ttyUSB0
+		sleep 1
+		echo -e -n "     CITRIX     ""NSSDX-26000-100G" > /dev/ttyUSB0
+		sleep 1
+        </BASH_ACTIONS>
+    </LCD>
+
+    <PRODUCT>
+        <PRODUCTNAME>NSSDX-26000-100G</PRODUCTNAME>
+        <CVM_CHIPS_PERCARD>0</CVM_CHIPS_PERCARD>
+        <ROOTCOMPLEXNOS>0</ROOTCOMPLEXNOS>
+        <DESCR>Netscaler Abacus 2 Socket, 4 NIC cards 2x100G port, 2 SSL cards with 2 Chips each</DESCR>
+    </PRODUCT>
+
+</SDX>

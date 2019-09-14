@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+     SDX (Netscaler) Platform Definition
+     Platform: Ballista
+-->
+<SDX>
+    <HARDWARE DMIDECODEID="68" VPXDMIID="70" SYSID="250148" VPXSYSID="450087" SYSFAMILY="2501xx">
+        <CPU>
+            <SOCKET>2</SOCKET>
+            <CORES>12</CORES>
+            <HYPER-THREADS>24</HYPER-THREADS>
+            <LAPIC_FREQ>0x0000000002faf750ULL</LAPIC_FREQ>
+            <TSC_FREQ>0x000000009AF8DA00ULL</TSC_FREQ>
+        </CPU>
+        <MEMORY>64</MEMORY> <!-- Unit GB -->
+        <NICS>
+            <INTF_AFFI SOCKET="0">"10/5,10/6,10/7,10/8,40/1,40/4"</INTF_AFFI>
+            <INTF_AFFI SOCKET="1">"10/1,10/2,10/3,10/4,40/2,40/3"</INTF_AFFI>
+            <ETH>
+                <INTERFACE name="0/1" type="igb" max_vfs="0">"eth0"</INTERFACE>
+                <INTERFACE name="0/2" type="igb" max_vfs="0">"eth1"</INTERFACE>
+                <INTERFACE name="10/1" type="i40e" max_vfs="32">"eth9"</INTERFACE>
+                <INTERFACE name="10/2" type="i40e" max_vfs="32">"eth10"</INTERFACE>
+                <INTERFACE name="10/3" type="i40e" max_vfs="32">"eth11"</INTERFACE>
+                <INTERFACE name="10/4" type="i40e" max_vfs="32">"eth12"</INTERFACE>
+                <INTERFACE name="10/5" type="i40e" max_vfs="32">"eth3"</INTERFACE>
+                <INTERFACE name="10/6" type="i40e" max_vfs="32">"eth4"</INTERFACE>
+                <INTERFACE name="10/7" type="i40e" max_vfs="32">"eth5"</INTERFACE>
+                <INTERFACE name="10/8" type="i40e" max_vfs="32">"eth6"</INTERFACE>
+                <INTERFACE name="40/1" type="i40e" max_vfs="32">"eth7"</INTERFACE>
+                <INTERFACE name="40/2" type="i40e" max_vfs="32">"eth13"</INTERFACE>
+                <INTERFACE name="40/3" type="i40e" max_vfs="32">"eth8"</INTERFACE>
+                <INTERFACE name="40/4" type="i40e" max_vfs="32">"eth2"</INTERFACE>
+            </ETH>
+        </NICS>
+        <SSL_CHIPS>8</SSL_CHIPS>
+        <SSL_VFS_PER_CHIP>8</SSL_VFS_PER_CHIP>
+        <DISKSLOT1>/sys/devices/pci0000:00/0000:00:1f.2/host*/target*/0*/block:* /sys/devices/pci0000:00/0000:00:1f.2/host*/target*/1*/block:*</DISKSLOT1>
+        <DISKSLOT2>/sys/devices/pci0000:00/0000:00:11.0/0000:*/host*/phy-*:0/port/end_device-*/*/*/block:* /sys/devices/pci0000:00/0000:00:11.0/0000:*/host*/phy-*:2/port/end_device-*/*/*/block:*</DISKSLOT2>
+        <DISKSLOT3>/sys/devices/pci0000:00/0000:00:11.0/0000:*/host*/phy-*:1/port/end_device-*/*/*/block:* /sys/devices/pci0000:00/0000:00:11.0/0000:*/host*/phy-*:3/port/end_device-*/*/*/block:*</DISKSLOT3>
+        <DISKSLOT4>/sys/devices/pci0000:00/0000:00:1f.2/host*/target*/2*/block:* /sys/devices/pci0000:00/0000:00:1f.2/host*/target*/3*/block:*</DISKSLOT4>
+    </HARDWARE>
+
+<!-- SVM -->
+    <IS_VLAN_STRIPPING>1</IS_VLAN_STRIPPING>
+    <INTERFACES_HAVE_CPU_AFFINITY>1</INTERFACES_HAVE_CPU_AFFINITY>
+    <UPDATE_LCD_ARGS>"/dev/ttyUSB0"</UPDATE_LCD_ARGS>
+    <INTF_CPU_AFFI>1</INTF_CPU_AFFI> <!-- Affi b/w socket intf -->
+    <CONTAINS_CAVIUM>1</CONTAINS_CAVIUM>
+    <CONTAINS_COLETO>0</CONTAINS_COLETO>
+    <CAVIUM_VF_TO_ACU_X>4375</CAVIUM_VF_TO_ACU_X>
+    <CAVIUM_VF_TO_SCU_X>3500</CAVIUM_VF_TO_SCU_X>
+
+    <CONTAINS_FORTVILLE>1</CONTAINS_FORTVILLE>
+    <FIPS_PARTITION>0</FIPS_PARTITION>
+	<MNX_DRIVER>0</MNX_DRIVER>
+    <HAS_ONLY_LOCAL_STORAGE>0</HAS_ONLY_LOCAL_STORAGE>
+    <IS_NEXT_GEN>1</IS_NEXT_GEN>
+    <USE_NEW_CORE_ALLOCATION_LOGIC>1</USE_NEW_CORE_ALLOCATION_LOGIC>
+    <MAX_CORES_PER_VM>10</MAX_CORES_PER_VM>
+    <MAX_VMS_PER_CORE>6</MAX_VMS_PER_CORE>
+    <PLAT_MAX_INST>25</PLAT_MAX_INST>
+    <NIC_XAPI_PLUGIN>"false"</NIC_XAPI_PLUGIN>
+
+    <PLAT_NAME>"BALLISTA"</PLAT_NAME>
+    <ACTIVE>1</ACTIVE>
+    <DEV_FILE_NAME>"./.BALLISTA"</DEV_FILE_NAME>
+    <NICK_NAME>Ballista</NICK_NAME> <!-- may be Used as Variable -->
+    <LICENSE> 
+        <NAME ID="0" T="0" I="25">"14000 40S"</NAME>
+        <NAME ID="14020" T="20000.0" I="25">"14020 40S"</NAME>
+        <NAME ID="14030" T="30000.0" I="25">"14030 40S"</NAME>
+        <NAME ID="14040" T="40000.0" I="25">"14040 40S"</NAME>
+        <NAME ID="14060" T="60000.0" I="25">"14060 40S"</NAME>
+        <NAME ID="14080" T="80000.0" I="25">"14080 40S"</NAME>
+        <NAME ID="14100" T="100000.0" I="25">"14100 40S"</NAME>
+    </LICENSE>
+
+    <DATA_INTF>"10/1,10/2,10/3,10/4,10/5,10/6,10/7,10/8,40/1,40/2,40/3,40/4"</DATA_INTF>
+    <MGMT_INTF>"0/1,0/2"</MGMT_INTF>
+	<THREADS_LAYOUT>"111111111111000000000000"</THREADS_LAYOUT>
+	<PRIMARY_RESERVED_THREADS>"000000000001000000000001"</PRIMARY_RESERVED_THREADS>
+	<ADJOINING_RESERVED_THREADS>"000000000010000000000010"</ADJOINING_RESERVED_THREADS>
+	<THREADS_AVAILABLE_FOR_VM>"111111111100111111111100"</THREADS_AVAILABLE_FOR_VM>
+	<ADJOINING_THREADS>"1,0,3,2,5,4,7,6,9,8,11,10,13,12,15,14,17,16,19,18,21,20,23,22"</ADJOINING_THREADS>
+    <!-- 
+         Disk allocation methods are: 
+         "ram_based_20_40GB": 20GB if memory>4GB and 40GB if memory>10GB. For gladius.
+         "ram_based_42_82GB": 42GB if memory>4GB and 82GB if memory>10GB. This is default method.
+         "rome_based_40GB": 40GB if core>1. For ROME
+    -->
+    <SECONDARY_DISK_ALLOCATION_METHOD>"ram_based_42_82GB"</SECONDARY_DISK_ALLOCATION_METHOD>
+    <SVM_VCPU_AFFINITY>12</SVM_VCPU_AFFINITY>
+    <FEATURE>
+        <L2MODE>1</L2MODE>
+        <RAID>1</RAID>
+        <SWRAID>1</SWRAID>
+    </FEATURE>
+
+    <!-- 
+         These actions are performed @ post install time. 
+         Given in the bash command format used in postinst.sh
+    -->
+    <POSTINSTALL>
+        <BASH_ACTIONS>
+	echo "options igb max_vfs=0,0 XSNSMode=0,0 XSNSVLANFiltering=0,0" > /etc/modprobe.d/igb
+	ln -s /etc/modprobe.d/igb /etc/modprobe.d/igb.conf
+	echo "options i40e max_vfs=20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20 XSNSMode=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 XSNSVLANFiltering=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1" > /etc/modprobe.d/i40e
+	ln -s /etc/modprobe.d/i40e /etc/modprobe.d/i40e.conf
+	/opt/xensource/libexec/xen-cmdline --set-xen "dom0_mem=6144M,max:6144M"
+	/opt/xensource/libexec/xen-cmdline --set-xen "extra_guest_irqs=40,512"
+	/opt/xensource/libexec/xen-cmdline --set-dom0 log_buf_len=512K
+	/opt/xensource/libexec/xen-cmdline --set-xen "iommu=sharept"
+	/opt/xensource/libexec/xen-cmdline --set-xen "dom0_max_vcpus=4"
+	mdadm --examine --scan > /etc/mdadm.conf
+	/opt/xensource/bin/setup_if_srules.py
+	/opt/xensource/bin/setup_pass_pif_state.sh
+	/opt/xensource/libexec/xen-cmdline --set-dom0 rd.driver.blacklist=i40e,mlx5_core,mlx5_en
+        </BASH_ACTIONS>
+    </POSTINSTALL>
+
+    <!-- 
+         These are commands executed for Platform Display.
+         Given in the bash command format used in svminst.sh
+    -->
+    <LCD>
+        <BASH_ACTIONS>
+        /bin/stty -F /dev/ttyUSB0 19200
+		sleep 1
+        echo -e -n $(echo -e -n /kA= | base64 -d)"     CITRIX    "" NSSDX-14000 40S " > /dev/ttyUSB0
+		sleep 2
+		echo -e -n $(echo -e -n /lg= | base64 -d) > /dev/ttyUSB0
+		sleep 1
+		echo -e -n "     CITRIX    "" NSSDX-14000 40S " > /dev/ttyUSB0
+        </BASH_ACTIONS>
+    </LCD>
+
+    <PRODUCT>
+        <PRODUCTNAME>NSSDX-14000-40S</PRODUCTNAME>
+        <CVM_CHIPS_PERCARD>4</CVM_CHIPS_PERCARD>
+        <ROOTCOMPLEXNOS>0</ROOTCOMPLEXNOS>
+        <ROOTCOMPLEXNOS>128</ROOTCOMPLEXNOS>
+        <DESCR>Netscaler Scytale 40G 2 Socket, 4 40G, 8 10G , 2 SSL cards with 4 Chips each</DESCR>
+    </PRODUCT>
+
+</SDX>
+

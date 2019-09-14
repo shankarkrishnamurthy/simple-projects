@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+     SDX (Netscaler) Platform Definition
+     Platform: Gladius - Single Socket 1 CPU, 1 DISK and 1 Mgmnt interface
+-->
+<SDX>
+    <HARDWARE DMIDECODEID="77" VPXDMIID="87" SYSID="30010" VPXSYSID="450092" SYSFAMILY="300xx">
+        <CPU>
+            <SOCKET>1</SOCKET>
+            <CORES>8</CORES>
+            <HYPER-THREADS>16</HYPER-THREADS>
+            <LAPIC_FREQ>0x0000000002faf750ULL</LAPIC_FREQ>
+            <TSC_FREQ>0x000000007D2B7500ULL</TSC_FREQ>
+        </CPU>
+        <MEMORY>32</MEMORY> <!-- Unit GB -->
+        <NICS>
+            <INTF_AFFI SOCKET="0">"1/1,1/2,1/3,1/4,1/5,1/6,10/1,10/2,10/3,10/4"</INTF_AFFI>
+            <ETH>
+                <INTERFACE name="0/1" type="igb" max_vfs="0">"eth0"</INTERFACE>
+                <INTERFACE name="1/1" type="igb" max_vfs="7">"eth6"</INTERFACE>
+                <INTERFACE name="1/2" type="igb" max_vfs="7">"eth5"</INTERFACE>
+                <INTERFACE name="1/3" type="igb" max_vfs="7">"eth4"</INTERFACE>
+                <INTERFACE name="1/4" type="igb" max_vfs="7">"eth3"</INTERFACE>
+                <INTERFACE name="1/5" type="igb" max_vfs="7">"eth2"</INTERFACE>
+                <INTERFACE name="1/6" type="igb" max_vfs="7">"eth1"</INTERFACE>
+                <INTERFACE name="10/1" type="i40e" max_vfs="32">"eth10"</INTERFACE>
+                <INTERFACE name="10/2" type="i40e" max_vfs="32">"eth9"</INTERFACE>
+                <INTERFACE name="10/3" type="i40e" max_vfs="32">"eth8"</INTERFACE>
+                <INTERFACE name="10/4" type="i40e" max_vfs="32">"eth7"</INTERFACE>
+            </ETH>
+        </NICS>
+        <MGMT_INTFS>eth0</MGMT_INTFS>
+        <SSL_CHIPS>1</SSL_CHIPS>
+        <SSL_VFS_PER_CHIP>32</SSL_VFS_PER_CHIP>
+        <DISKS>
+            <DISKSLOT1>/sys/devices/pci0000:00/0000:00:1f.2/host*/target*/4*/block:*</DISKSLOT1>
+            <DISKDEVICE1>/dev/sda4</DISKDEVICE1>
+            <DISKNAME1>Local storage</DISKNAME1>
+        </DISKS>
+    </HARDWARE>
+
+<!-- SVM -->
+    <IS_VLAN_STRIPPING>1</IS_VLAN_STRIPPING>
+    <INTERFACES_HAVE_CPU_AFFINITY>1</INTERFACES_HAVE_CPU_AFFINITY>
+    <UPDATE_LCD_ARGS>"/dev/ttyUSB0"</UPDATE_LCD_ARGS>
+    <INTF_CPU_AFFI>1</INTF_CPU_AFFI> <!-- Affi b/w socket intf -->
+    <CONTAINS_CAVIUM>0</CONTAINS_CAVIUM>
+    <CONTAINS_COLETO>1</CONTAINS_COLETO>
+    <CAVIUM_VF_TO_ACU_X>10</CAVIUM_VF_TO_ACU_X>
+    <CAVIUM_VF_TO_SCU_X>10</CAVIUM_VF_TO_SCU_X>
+    <CONTAINS_FORTVILLE>1</CONTAINS_FORTVILLE>
+    <FIPS_PARTITION>0</FIPS_PARTITION>
+	<MNX_DRIVER>0</MNX_DRIVER>
+    <HAS_ONLY_LOCAL_STORAGE>1</HAS_ONLY_LOCAL_STORAGE>
+    <IS_NEXT_GEN>1</IS_NEXT_GEN>
+    <USE_NEW_CORE_ALLOCATION_LOGIC>1</USE_NEW_CORE_ALLOCATION_LOGIC>
+    <MAX_CORES_PER_VM>7</MAX_CORES_PER_VM>
+    <MAX_VMS_PER_CORE>6</MAX_VMS_PER_CORE>
+    <NIC_XAPI_PLUGIN>"false"</NIC_XAPI_PLUGIN>
+
+    <PLAT_MAX_INST>7</PLAT_MAX_INST>
+    <PLAT_NAME>"GLADIUS"</PLAT_NAME>
+    <ACTIVE>1</ACTIVE>
+    <DEV_FILE_NAME>"./.GLADIUS"</DEV_FILE_NAME>
+    <NICK_NAME>Gladius</NICK_NAME> <!-- may be Used as Variable -->
+    <LICENSE> 
+        <NAME ID="0" T="0" I="0">"8900"</NAME>
+        <NAME ID="8910" T="10000.0" I="2">"8910"</NAME>
+        <NAME ID="8920" T="20000.0" I="4">"8920"</NAME>
+        <NAME ID="8930" T="30000.0" I="7">"8930"</NAME>
+    </LICENSE>
+
+    <DATA_INTF>"1/1,1/2,1/3,1/4,1/5,1/6,10/1,10/2,10/3,10/4"</DATA_INTF>
+    <MGMT_INTF>"0/1"</MGMT_INTF>
+	<THREADS_LAYOUT>"0000000000000000"</THREADS_LAYOUT>
+	<PRIMARY_RESERVED_THREADS>"1100000000000000"</PRIMARY_RESERVED_THREADS>
+	<ADJOINING_RESERVED_THREADS>"0000000000000000"</ADJOINING_RESERVED_THREADS>
+	<THREADS_AVAILABLE_FOR_VM>"0011111111111111"</THREADS_AVAILABLE_FOR_VM>
+	<ADJOINING_THREADS>"1,0,3,2,5,4,7,6,9,8,11,10,13,12,15,14"</ADJOINING_THREADS>
+
+    <!-- 
+         Disk allocation methods are: 
+         "ram_based_20_40GB": 20GB if memory>4GB and 40GB if memory>10GB. For gladius.
+         "ram_based_42_82GB": 42GB if memory>4GB and 82GB if memory>10GB. This is default method.
+         "rome_based_40GB": 40GB if core>1. For ROME
+    -->
+	<SECONDARY_DISK_ALLOCATION_METHOD>"ram_based_20_40GB"</SECONDARY_DISK_ALLOCATION_METHOD>
+
+    <SVM_VCPU_AFFINITY>15</SVM_VCPU_AFFINITY>
+    <FEATURE>
+        <L2MODE>1</L2MODE>
+        <RAID>0</RAID>
+        <SWRAID>0</SWRAID>
+    </FEATURE>
+
+    <!-- 
+         These actions are performed @ post install time. 
+         Given in the bash command format used in postinst.sh
+         Note: Leave xsnsmode 1 for mgmt port
+    -->
+    <POSTINSTALL>
+        <BASH_ACTIONS>
+    echo "options igb max_vfs=7,7,7,7,7,7,0 XSNSMode=1,1,1,1,1,1,1 XSNSVLANFiltering=1,1,1,1,1,1,0" > /etc/modprobe.d/igb
+    echo "options i40e max_vfs=20,20,20,20 XSNSMode=1,1,1,1 XSNSVLANFiltering=1,1,1,1 XSNSNVMRange=4.53-5.05,4.53-5.05,4.53-5.05,4.53-5.05" > /etc/modprobe.d/i40e
+	ln -s /etc/modprobe.d/igb /etc/modprobe.d/igb.conf
+	ln -s /etc/modprobe.d/i40e /etc/modprobe.d/i40e.conf
+	/opt/xensource/libexec/xen-cmdline --set-xen "dom0_max_vcpus=4"
+	/opt/xensource/libexec/xen-cmdline --set-xen "dom0_mem=2144M,max:2144M"
+	/opt/xensource/libexec/xen-cmdline --set-xen "extra_guest_irqs=40,512"
+	/opt/xensource/libexec/xen-cmdline --set-dom0 "vmalloc=192M"
+	/opt/xensource/libexec/xen-cmdline --set-dom0 log_buf_len=512K
+	echo "Hide pci device corresponding to port 0/1 which is used as LOM port in Gladius SDX"
+	/opt/xensource/libexec/xen-cmdline --set-dom0 "pciback.hide=(0000:10:00.0) xen-pciback.hide=(0000:10:00.0)"
+	/opt/xensource/bin/setup_if_srules.py
+	/opt/xensource/bin/setup_pass_pif_state.sh
+	/opt/xensource/libexec/xen-cmdline --set-dom0 rd.driver.blacklist=i40e,mlx5_core,mlx5_en
+        </BASH_ACTIONS>
+    </POSTINSTALL>
+    <!-- 
+         These are commands executed for Platform Display.
+         Given in the bash command format used in svminst.sh
+    -->
+    <LCD>
+        <BASH_ACTIONS>
+        /bin/stty -F /dev/ttyUSB0 19200
+		sleep 1
+        echo -e -n $(echo -e -n /kA= | base64 -d)"     CITRIX     ""   NSSDX-8900   " > /dev/ttyUSB0
+		sleep 2
+		echo -e -n $(echo -e -n /lg= | base64 -d) > /dev/ttyUSB0
+		sleep 1
+		echo -e -n "     CITRIX     ""   NSSDX-8900   " > /dev/ttyUSB0
+		sleep 1
+        </BASH_ACTIONS>
+    </LCD>
+
+    <PRODUCT>
+        <PRODUCTNAME>NSSDX-8900</PRODUCTNAME>
+        <CVM_CHIPS_PERCARD>8</CVM_CHIPS_PERCARD>
+        <ROOTCOMPLEXNOS>0</ROOTCOMPLEXNOS>
+        <DESCR>Netscaler Gladius 1 Socket, 6 1G, 4 10G , 1 SSL cards with 1 Chips each</DESCR>
+    </PRODUCT>
+
+</SDX>

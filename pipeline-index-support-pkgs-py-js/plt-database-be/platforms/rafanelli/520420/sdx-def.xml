@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+     SDX (Netscaler) Platform Definition
+     Platform: Rafanelli - Two Socket 2 CPUs, 6 DISKs and 2 Mgmnt interface
+-->
+<SDX>
+    <HARDWARE DMIDECODEID="6F" VPXDMIID="98" SYSID="520420" VPXSYSID="450097" SYSFAMILY="520xx">
+        <CPU>
+            <SOCKET>2</SOCKET>
+            <CORES>8</CORES>
+            <HYPER-THREADS>32</HYPER-THREADS>
+            <LAPIC_FREQ>0x0000000002faf750ULL</LAPIC_FREQ>
+            <TSC_FREQ>0x000000007D2B7500ULL</TSC_FREQ>
+        </CPU>
+        <MEMORY>128</MEMORY> <!-- Unit GB -->
+        <NICS>
+		<INTF_AFFI SOCKET="0">"25/1,25/2,25/3,25/4,25/5,25/6,25/7,25/8,25/9,25/10,25/11,25/12,25/13,25/14,25/15,25/16"</INTF_AFFI>
+            <ETH>
+                <INTERFACE name="0/1" type="igb" max_vfs="0">"eth0"</INTERFACE>
+                <INTERFACE name="0/2" type="igb" max_vfs="0">"eth1"</INTERFACE>
+                <INTERFACE name="25/1" type="i40e" max_vfs="20">"eth10"</INTERFACE>
+                <INTERFACE name="25/2" type="i40e" max_vfs="20">"eth11"</INTERFACE>
+                <INTERFACE name="25/3" type="i40e" max_vfs="20">"eth14"</INTERFACE>
+                <INTERFACE name="25/4" type="i40e" max_vfs="20">"eth15"</INTERFACE>
+                <INTERFACE name="25/5" type="i40e" max_vfs="20">"eth12"</INTERFACE>
+                <INTERFACE name="25/6" type="i40e" max_vfs="20">"eth13"</INTERFACE>
+                <INTERFACE name="25/7" type="i40e" max_vfs="20">"eth16"</INTERFACE>
+                <INTERFACE name="25/8" type="i40e" max_vfs="20">"eth17"</INTERFACE>
+                <INTERFACE name="25/9" type="i40e" max_vfs="20">"eth8"</INTERFACE>
+                <INTERFACE name="25/10" type="i40e" max_vfs="20">"eth9"</INTERFACE>
+                <INTERFACE name="25/11" type="i40e" max_vfs="20">"eth6"</INTERFACE>
+                <INTERFACE name="25/12" type="i40e" max_vfs="20">"eth7"</INTERFACE>
+                <INTERFACE name="25/13" type="i40e" max_vfs="20">"eth2"</INTERFACE>
+                <INTERFACE name="25/14" type="i40e" max_vfs="20">"eth3"</INTERFACE>
+                <INTERFACE name="25/15" type="i40e" max_vfs="20">"eth4"</INTERFACE>
+                <INTERFACE name="25/16" type="i40e" max_vfs="20">"eth5"</INTERFACE>
+            </ETH>
+        </NICS>
+        <MGMT_INTFS>eth0 eth1</MGMT_INTFS>
+        <SSL_CHIPS>4</SSL_CHIPS>
+        <SSL_VFS_PER_CHIP>32</SSL_VFS_PER_CHIP>
+        <DISKS>
+            <DISKSLOT1>/sys/devices/pci0000:00/0000:00:1f.2/ata*/host*/target*/4*/block/* /sys/devices/pci0000:00/0000:00:1f.2/ata*/host*/target*/5*/block/*</DISKSLOT1>
+            <DISKDEVICE1>/dev/md_d0p4</DISKDEVICE1>
+            <DISKNAME1>Local storage</DISKNAME1>
+
+            <DISKSLOT2>/sys/devices/pci0000:00/0000:00:11.4/ata*/host*/target*/0*/block/* /sys/devices/pci0000:00/0000:00:11.4/ata*/host*/target*/1*/block/*</DISKSLOT2>
+            <DISKDEVICE2>/dev/md_d1</DISKDEVICE2>
+            <DISKNAME2>VPX-SR</DISKNAME2>
+
+	    <DISKSLOT3>/sys/devices/pci0000:00/0000:00:11.4/ata*/host*/target*/2*/block/* /sys/devices/pci0000:00/0000:00:11.4/ata*/host*/target*/3*/block/*</DISKSLOT3>
+            <DISKDEVICE3>/dev/md_d2</DISKDEVICE3>
+            <DISKNAME3>VPX-SR-2</DISKNAME3>
+
+	    <DISKSLOT4>/sys/devices/pci0000:00/0000:00:1f.2/ata*/host*/target*/6*/block/* /sys/devices/pci0000:00/0000:00:1f.2/ata*/host*/target*/7*/block/*</DISKSLOT4>
+            <DISKDEVICE4>/dev/md_d3</DISKDEVICE4>
+            <DISKNAME4>VPX-SR-3</DISKNAME4>
+        </DISKS>
+        <BAYINFO>sata:4 sata:5 sata:6 sata:7 sata:0 sata:1 sata:2 sata:3</BAYINFO>
+    </HARDWARE>
+
+<!-- SVM -->
+    <IS_VLAN_STRIPPING>0</IS_VLAN_STRIPPING>
+    <INTERFACES_HAVE_CPU_AFFINITY>1</INTERFACES_HAVE_CPU_AFFINITY>
+    <UPDATE_LCD_ARGS>"/dev/ttyUSB0"</UPDATE_LCD_ARGS>
+    <INTF_CPU_AFFI>1</INTF_CPU_AFFI> <!-- Affi b/w socket intf -->
+    <CONTAINS_CAVIUM>0</CONTAINS_CAVIUM>
+    <CONTAINS_COLETO>1</CONTAINS_COLETO>
+    <CONTAINS_FORTVILLE>1</CONTAINS_FORTVILLE>
+    <CAVIUM_VF_TO_ACU_X>10</CAVIUM_VF_TO_ACU_X>
+    <CAVIUM_VF_TO_SCU_X>10</CAVIUM_VF_TO_SCU_X>
+    <FIPS_PARTITION>0</FIPS_PARTITION>
+    <HAS_ONLY_LOCAL_STORAGE>0</HAS_ONLY_LOCAL_STORAGE>
+    <MNX_DRIVER>0</MNX_DRIVER>
+    <IS_NEXT_GEN>1</IS_NEXT_GEN>
+    <USE_NEW_CORE_ALLOCATION_LOGIC>1</USE_NEW_CORE_ALLOCATION_LOGIC>
+    <MAX_CORES_PER_VM>14</MAX_CORES_PER_VM>
+    <MAX_VMS_PER_CORE>6</MAX_VMS_PER_CORE>
+    <NIC_XAPI_PLUGIN>"v1"</NIC_XAPI_PLUGIN>
+
+    <PLAT_MAX_INST>50</PLAT_MAX_INST>
+    <PLAT_NAME>"RAFANELLI"</PLAT_NAME>
+    <ACTIVE>1</ACTIVE>
+
+    <DEV_FILE_NAME>"./.RAFANELLI"</DEV_FILE_NAME>
+    <NICK_NAME>Rafanelli</NICK_NAME> <!-- may be Used as Variable -->
+    <PCIBACK_HIDE>(00:11.4)</PCIBACK_HIDE>
+    <LICENSE> 
+        <NAME ID="0" T="0" I="0">"15000-25G"</NAME>
+        <NAME ID="15020" T="20000.0" I="5">"15020-25G"</NAME>
+        <NAME ID="15030" T="30000.0" I="20">"15030-25G"</NAME>
+        <NAME ID="15040" T="40000.0" I="30">"15040-25G"</NAME>
+        <NAME ID="15060" T="60000.0" I="40">"15060-25G"</NAME>
+        <NAME ID="15080" T="80000.0" I="45">"15080-25G"</NAME>
+        <NAME ID="15100" T="100000.0" I="50">"15100-25G"</NAME>
+    </LICENSE>
+
+    <DATA_INTF>"25/1,25/2,25/3,25/4,25/5,25/6,25/7,25/8,25/9,25/10,25/11,25/12,25/13,25/14,25/15,25/16"</DATA_INTF>
+    <MGMT_INTF>"0/1,0/2"</MGMT_INTF>
+        <THREADS_LAYOUT>              "11111111111111110000000000000000"</THREADS_LAYOUT>
+	<PRIMARY_RESERVED_THREADS>    "00000000000000010000000000000001"</PRIMARY_RESERVED_THREADS>
+	<ADJOINING_RESERVED_THREADS>  "00000000000000100000001000000010"</ADJOINING_RESERVED_THREADS>
+	<THREADS_AVAILABLE_FOR_VM>    "11111111111111001111111111111100"</THREADS_AVAILABLE_FOR_VM>
+	<ADJOINING_THREADS>"1,0,3,2,5,4,7,6,9,8,11,10,13,12,15,14,17,16,19,18,21,20,23,22,25,24,27,26,29,28,31,30"</ADJOINING_THREADS>
+    <!-- 
+         Disk allocation methods are: 
+         "ram_based_20_40GB": 20GB if memory>4GB and 40GB if memory>10GB. For gladius.
+         "ram_based_42_82GB": 42GB if memory>4GB and 82GB if memory>10GB. This is default method.
+         "rome_based_40GB": 40GB if core>1. For ROME
+    -->
+    <SECONDARY_DISK_ALLOCATION_METHOD>"ram_based_42_82GB"</SECONDARY_DISK_ALLOCATION_METHOD>
+    <SVM_VCPU_AFFINITY>15</SVM_VCPU_AFFINITY>
+    <FEATURE>
+        <L2MODE>1</L2MODE>
+        <RAID>1</RAID>
+        <SWRAID>1</SWRAID>
+    </FEATURE>
+
+    <!-- 
+         These actions are performed @ post install time. 
+         Given in the bash command format used in postinst.sh
+    -->
+    <POSTINSTALL>
+	<BASH_ACTIONS>
+	echo "options igb max_vfs=0,0 XSNSMode=0,0 XSNSVLANFiltering=0,0" > /etc/modprobe.d/igb
+	echo "options i40e max_vfs=20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20 XSNSMode=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 XSNSVLANFiltering=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 XSNSNVMRange=4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02,4.53-6.02" > /etc/modprobe.d/i40e
+	echo "options mlx5_core  XSNSMode=1,1,1,1,1,1,1,1 debug_mask=0x40000008 XSNSFwRange=12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010,12.20.1600-12.21.2010 XSNSVLANFiltering=1,1,1,1,1,1,1,1 max_vfs=63,63,63,63,63,63,63,63" > /etc/modprobe.d/mlx5_core.conf
+	ln -s /etc/modprobe.d/igb /etc/modprobe.d/igb.conf
+	ln -s /etc/modprobe.d/i40e /etc/modprobe.d/i40e.conf
+	/opt/xensource/libexec/xen-cmdline --set-xen "dom0_mem=8192M,max:8192M"
+	/opt/xensource/libexec/xen-cmdline --set-xen "dom0_max_vcpus=1-8"
+	/opt/xensource/libexec/xen-cmdline --set-xen "extra_guest_irqs=40,512"
+	/opt/xensource/libexec/xen-cmdline --set-xen "x2apic_phys=true"
+	/opt/xensource/libexec/xen-cmdline --set-dom0 "vmalloc=192M"
+	/opt/xensource/libexec/xen-cmdline --set-dom0 log_buf_len=1M
+	/opt/xensource/libexec/xen-cmdline --set-dom0 "nodmraid"
+	echo "POLICY_DYN=max" > /var/lib/xen/tune-vcpus-policy
+	echo "Creating /var/lib/xen/tune-vcpus-policy file for Dom0 vcpus"
+	mdadm --examine --scan > /etc/mdadm.conf
+        </BASH_ACTIONS>
+    </POSTINSTALL>
+    <!-- 
+         These are commands executed for Platform Display.
+         Given in the bash command format used in svminst.sh
+    -->
+    <LCD>
+        <BASH_ACTIONS>
+        /bin/stty -F /dev/ttyUSB0 19200
+		sleep 1
+        echo -e -n $(echo -e -n /kA= | base64 -d)"     CITRIX     "" NSSDX-15000-25G" > /dev/ttyUSB0
+		sleep 2
+		echo -e -n $(echo -e -n /lg= | base64 -d) > /dev/ttyUSB0
+		sleep 1
+		echo -e -n "     CITRIX     "" NSSDX-15000-25G" > /dev/ttyUSB0
+		sleep 1
+        </BASH_ACTIONS>
+    </LCD>
+
+    <PRODUCT>
+        <PRODUCTNAME>NSSDX-15000-25G</PRODUCTNAME>
+        <CVM_CHIPS_PERCARD>0</CVM_CHIPS_PERCARD>
+        <ROOTCOMPLEXNOS>0</ROOTCOMPLEXNOS>
+        <DESCR>Netscaler Rafanelli 2 Socket, 8 NIC cards 2x25G ports, 2 SSL cards with 2 Chips each</DESCR>
+    </PRODUCT>
+
+</SDX>
