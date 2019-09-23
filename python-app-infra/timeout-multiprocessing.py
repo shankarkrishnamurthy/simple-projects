@@ -9,7 +9,6 @@ import random
 import heapq
 import os,sys
 import signal
-import constant
 
 class TimerIntf(object):
     def run(self): pass
@@ -103,14 +102,14 @@ def inthandler(signum, frame):
 if __name__ == "__main__":
     thlist = []
     print 'Testing Timer Infra (time=',time.time(),')'
-    constant.nT = 6
-    constant.tRange = [10,30]
+    MAXTIME,NEVT=10,10
 
     signal.signal(signal.SIGINT, inthandler)
     t = myTimeout()
+
     # Create bunch of test timers
-    for i in range(1,constant.nT):
-        ti = random.randint(*constant.tRange)
+    for i in range(NEVT):
+        ti = random.randint(1,MAXTIME)
         obj = myObj(i+100)
 
         # Insert a time to wait with TimerIntf Object
@@ -119,11 +118,11 @@ if __name__ == "__main__":
         print ' Creating ', i, ' timer ', th.name, ' fires after ', ti, ' secs @ ', th._tc
 
     time.sleep(random.randint(1,3))
-    rl = random.sample(thlist, constant.nT/2)
+    rl = random.sample(thlist, NEVT/2)
     for i in rl:
         # Pick a timer index and cancel
         print i.name,' Cancelling ', i._id, ' timer @ ', i._tc
         t.cancelPendingTimeout(i)
 
+    time.sleep(MAXTIME+1)
     #evtThr.join() # Blocking to signals
-    while True: time.sleep(100)

@@ -49,7 +49,7 @@ class myTimeout(object):
             self.qlock.release()
             #print "Event Wait ", tw, to if tw else None
             rc = self.evt.wait(tw)
-            if rc != True:
+            if rc == False: # no event occurred (instead timeout happened)
                 obj.run(to)
             else:
                 self.evt.clear()
@@ -62,13 +62,13 @@ def inthandler(signum, frame):
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, inthandler)
     t = myTimeout()
+    MAXTIME,NEVT=10,5
     
-    for i in range(1,5):
-        ti = random.randint(5,30)
+    for i in range(NEVT):
+        ti = random.randint(1,MAXTIME)
         obj = myObj(i+100)
 
         # Insert a time to wait with TimerIntf Object
         t.callAfterTimeoutSecs(ti,obj)
 
-    #evtThr.join() # Blocking to signals
-    while True: time.sleep(100)
+    time.sleep(MAXTIME)
