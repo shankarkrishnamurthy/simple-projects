@@ -1,26 +1,28 @@
 <table class="table table-striped table-bordered">
     <thead class="thead-dark">
-        <tr>
-            <th scope="col">SR #</th>
+        <tr class="d-flex col-sm-12" style="padding: 0px;">
+            <th scope="col" class="col-sm-2">SR #</th>
+            <th scope="col" class="col-sm-2">JIRA/CUSTOMER</th>
+            <!--            <th scope="col" class="col-sm-2">PACKAGES</th>
+-->
+            <th scope="col" class="col-sm-2">MODIFIED</th>
+            <th scope="col" class="col-sm-6">PLATFORMS/BUILDS</th>
 
-            <th scope="col">PLATFORMS/BUILDS</th>
-            <th scope="col">JIRA/CUSTOMER</th>
-            <th scope="col">PACKAGES</th>
-            <th scope="col">MODIFIED</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="srlist">
         {{#each srlist}}
-        <tr>
-            <th scope="row">{{{this.sr}}}</th>
-            <td>{{{this.bp}}}</td>
-            <td><b><a href="https://issues.citrite.net/browse/{{this.jid}}">{{{this.jid}}}</a></b><br><i>{{{this.cn}}}</i> </td>
-            <td>{{{this.pkg}}}</td>
-            <td>{{{this.lmt}}}</td>
+        <tr class="d-flex col-sm-12" style="padding: 0px;">
+            <th scope="row" class="col-sm-2">{{{this.sr}}}</th>
+            <td class="col-sm-2"><b><a href="https://issues.citrite.net/browse/{{this.jid}}">{{{this.jid}}}</a></b>
+                <br><i>{{{this.cn}}}</i> </td>
+            <!--            <td class="col-sm-2">{{{this.pkg}}}</td>
+-->
+            <td class="col-sm-2">{{{this.lmt}}}</td>
+            <td class="col-sm-6">{{{this.bp}}}</td>
 
         </tr>
         {{/each}}
     </tbody>
 </table>
 <i class="d-inline"> (last indexed: {{ lut }}) </i>
-</div>

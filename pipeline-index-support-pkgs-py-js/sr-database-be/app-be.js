@@ -346,6 +346,7 @@ function render_srl(req, res, srs, n, s, e, ty) {
         ns: ns,
         ne: ne,
         ps: ps,
+        fpage: (ty == 'filter'),
     });
 }
 

@@ -1,138 +1,113 @@
 /*
-    Author: Shankar K (Oct 2017)
+    Author: Shankar K (Oct 2019)
     Description:
-        First simple web application to manage day-to-day task lists
+        simple front end enhancing handlebars
 */
 
-
-$(document).on("ready", function(){
-    /* 
-        Fill up responses:
-        1. Front end: create button and send post 
-        2. Backend : Write mongodb schema and create post API
-    */
-    function readBody(xhr) {
-        var data;
-        if (!xhr.responseType || xhr.responseType === "text") {
-            data = xhr.responseText;
-        } else if (xhr.responseType === "document") {
-            data = xhr.responseXML;
-        } else {
-            data = xhr.response;
-        }
-        return data;
-    }
-    
-    function displayLiItemStr(str, id) {
-        var liItem = '<li class="list-group-item" data-id="' + id + '"><input type="checkbox" class="mycheck"> <div class="tasktext">'+ str  + ' </div></span><span class="glyphicon glyphicon-remove taskgly "></span></li>';
-        return liItem;
-    }
-    
-    /*  
-        JSON-GENERATOR:
-            createDate: '{{date(new Date(2017, 1, 1), new Date(), "YYYY-MM-dd hh:mm:ss")}}',
-            taskDesc: '{{lorem(integer(15,25), "words")}}' (OR)  task:'{{lorem(1,"sentences")}}'
-    */
-    function setupInitialView() {
-        var req = new XMLHttpRequest();
-        req.open("GET", "/tasks", true);
-        req.onload = function () {
-            if (req.status == 200) {
-                data = JSON.parse(readBody(req));
-                for (var i=0;i < data.length; i++) {
-                    var liItem = displayLiItemStr(data[i].task, data[i]._id);
-                    $(".cTaskList").append(liItem);
-                }
-            }
-        };
-        req.send();
-        $(".imgmore").css("display", 'none');
-    }
-
-    $(".creategly").click(function() {
-        var str = $("input").val();
-        if (!str || str.length == 0) {
+function stat_plt() {
+    var phash = {};
+    var ch = $("#srlist").children()
+    ch.each((i, v) => {
+        var sr = v.cells[0].textContent;
+        var p = v.cells[3].textContent;
+        if (!p) {
             return;
         }
-        
-        var req = {
-            url: '/tasks',
-            type: 'POST',
-            success: onSuccess,
-            error: onError,
-            data: JSON.stringify({ task: str }),
-            contentType: 'application/json; charset=utf-8'
+        var pn = p.match(/Platform: (.*?);/m);
+        pn = pn || p.match(/Product Name: (.*?);/m)
+        var plt = 'Unknown';
+        if (pn) {
+            plt = pn[1].replace(/NetScaler Virtual Appliance NSSDX/g, 'NSSDX');
+            plt = plt.replace(/(NSSDX.*) 45\d+$/, '$1')
+            plt = plt.replace(/(NSMPX.*?) .*/, '$1')
+            if (plt.match(/SDX|MPX/))
+                plt = plt.replace(/ /g, '-');
+        }
+        var val = phash[plt] || 0
+        phash[plt] = val + 1
+    })
+    var htmlstr = '';
+    var keys = Object.keys(phash)
+    keys.sort(function (a, b) {
+        return phash[b] - phash[a];
+    });
+    htmlstr = '<div class="table-responsive col-md-6"><table class="table table-striped table-bordered">'
+    keys.forEach(function (k) {
+        var adm = ''
+        for (p in phglobal) {
+            var re = new RegExp(p, 'g');
+            if (k.match(re)) {
+                adm = ' (' + phglobal[p] + ')';
+                break;
+            }
+        }
+        htmlstr += '<tr>' + '<td>' + k + adm + '</td>' + '<td>' + phash[k]
+        '</td>' + '</tr>'
+    })
+    htmlstr += '</table></div>'
+    return htmlstr;
+}
+
+function stat_bld() {
+    var phash = {};
+    var ch = $("#srlist").children()
+    ch.each((i, v) => {
+        var sr = v.cells[0].textContent;
+        var p = v.cells[3].textContent;
+        if (!p) {
+            return;
+        }
+        var getNS = function (f1, f2, f3) {
+            var val = phash[f2] || 0
+            phash[f2] = val + 1
         };
-        $.ajax(req);
-        
-        function onSuccess(data) {
-            var liItem = displayLiItemStr(data.task, data._id);
-            $(".cTaskList li:first").before(liItem);
-        }
-        function onError(r, err) {
-            alert("Request: "+JSON.stringify(err));
-        }
+        var getSBI = function (f1, f2, f3) {
+            var val = phash['SBI' + f2] || 0
+            phash['SBI' + f2] = val + 1
+        };
+        var getSVM = function (f1, f2, f3) {
+            var val = phash['SVM' + f2] || 0
+            phash['SVM' + f2] = val + 1
+        };
+        p.replace(/NetScaler (NS.*?): /g, getNS)
+        p.replace(/SDX_PLATFORM_SBI=(.*?)-/g, getSBI)
+        p.replace(/svm-(.*?)-/g, getSVM)
+    })
+    var htmlstr = '';
+    var keys = Object.keys(phash)
+    keys.sort(function (a, b) {
+        return phash[b] - phash[a];
+    });
+    htmlstr = '<div class="table-responsive col-md-6"><table class="table table-striped table-bordered">'
+    keys.forEach(function (k) {
+        htmlstr += '<tr>' + '<td>' + k + '</td>' + '<td>' + phash[k] + '</td>' + '</tr>'
     })
 
-    $(".taskmore").click(function() {
-        start_think();
-        function onSuccess(data) {
-            for (var i=0;i < data.length; i++) {
-                var liItem = displayLiItemStr(data[i].task, data[i]._id);
-                $(".cTaskList").append(liItem);
-            }
-            stop_think();
-        }
-        function onError(r, err) {
-            alert("Request: "+JSON.stringify(err));
-            stop_think();
-        }
-        var req = {
-            url: '/tasks',
-            type: 'GET',
-            success: onSuccess,
-            error: onError
+    htmlstr += '</table></div>'
+    return htmlstr;
+}
 
-        };
-        $.ajax(req);
-    });
-    
-    $(".cTaskList").on("click", ".taskgly", function() {
-        var item = $(this).closest("li");
-        var id =  item[0].getAttribute("data-id");
-        console.log("Pressed taskgly - delete the task " + item.index() + " id " + id )
-            
-        var req = {
-            url: '/tasks/' + id ,
-            type: 'DELETE',
-            success: onSuccess,
-            error: onError,
-        };
-        $.ajax(req);
-        
-        function onSuccess(data) {
-            item.remove();
-        }
-        function onError(r, err) {
-            alert(JSON.stringify(err));
-        }
-    });
-    
-    $(".mycollapse").click(function() {
-        $(".cTaskList").empty();
-        setupInitialView();
-    });
+var phglobal = {
+    '450000': 'XEN',
+    '450001': 'XEN_CISCO',
+    '450010': 'ESX',
+    '450011': 'ESX_CISCO',
+    '450020': 'HYP',
+    '450021': 'HYP_CISCO',
+    '450070': 'KVM',
+    '450071': 'KVM_CISCO',
+    '450040': 'AWS',
+    '450090': 'CPX',
+    '450091': 'BLX',
+};
 
-    function start_think() {
-        $(".taskmore").css("display", 'none');
-        $(".imgmore").css("display", 'block');
-    }
-    
-    function stop_think() {
-        $(".imgmore").css("display", 'none');
-        $(".taskmore").css("display", 'block');
-    }
 
-    /* Setup Initial view */
-    setupInitialView()
-})
+$(document).ready(function () {
+    $("#Stat").click(function (e) {
+        var locn = window.location.pathname;
+        window.location.hash = "#stats"
+        var plthtml = stat_plt();
+        var bldhtml = stat_bld();
+        $("#stats").html('<div class="row">' + plthtml + bldhtml + '</div')
+    });
+});
