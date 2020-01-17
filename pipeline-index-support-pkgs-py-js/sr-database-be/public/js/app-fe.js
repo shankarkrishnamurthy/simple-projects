@@ -4,12 +4,16 @@
         simple front end enhancing handlebars
 */
 
-function stat_plt() {
+function stat_plt(s, e) {
     var phash = {};
     var ch = $("#srlist").children()
     ch.each((i, v) => {
         var sr = v.cells[0].textContent;
         var p = v.cells[3].textContent;
+        var d = new Date(v.cells[2].textContent)
+        if ((d < s) || (d > e)) {
+            return;
+        }
         if (!p) {
             return;
         }
@@ -48,12 +52,17 @@ function stat_plt() {
     return htmlstr;
 }
 
-function stat_bld() {
+function stat_bld(s, e) {
     var phash = {};
     var ch = $("#srlist").children()
     ch.each((i, v) => {
         var sr = v.cells[0].textContent;
         var p = v.cells[3].textContent;
+        var d = new Date(v.cells[2].textContent)
+            //console.log(d + ' : ' + s + "-" + e);
+        if ((d < s) || (d > e)) {
+            return;
+        }
         if (!p) {
             return;
         }
@@ -106,8 +115,25 @@ $(document).ready(function () {
     $("#Stat").click(function (e) {
         var locn = window.location.pathname;
         window.location.hash = "#stats"
-        var plthtml = stat_plt();
-        var bldhtml = stat_bld();
+        var s = $("#FD").val() || null;
+        var e = $("#LD").val() || Date.now();
+        s = new Date(s);
+        e = new Date(e);
+        var plthtml = stat_plt(s, e);
+        var bldhtml = stat_bld(s, e);
         $("#stats").html('<div class="row">' + plthtml + bldhtml + '</div')
     });
+    $(function () {
+        $(".datepicker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            changeDate: true,
+            showButtonPanel: true,
+            dateFormat: 'yy-mm-dd',
+            onClose: function (dateText, inst) {
+                $(this).datepicker();
+            }
+        });
+    });
+
 });
