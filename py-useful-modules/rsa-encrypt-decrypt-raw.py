@@ -10,7 +10,8 @@ import base64
 
 f = open('/root/kp-adcaas-shankar.pem','r')
 k = importKey(f.read())
-print (hex(k.n),hex(k.d),hex(k.e))
+print (' n = ', hex(k.n), 'd = ', hex(k.d),'e = ',hex(k.e))
+print
 #print(dir(k), k.__dict__)
 
 p1 = long('bf59310903b36db3e3acb5d588d1e37b4a4a729e188b5f5289133ae7d513b0ee88e3849ac1dfcfadb30ad17404c81d91ede412befc9a3ae8f6c0fac8cbe8691cfdd9adcca25b1f5113ab9066791b9dae37cd840be3a3bb398c00e880111042b8113402a53dd2fde3ff671bb2896dd7f58e241616639f46dda89fe2a0dd3b870b',16)
@@ -38,7 +39,14 @@ pvtkey.e = e
 m = pow(c,d,n)
 print('decrypted/original data ', m)
 
+# Now lets do the opposite
 
+c = pow(data, d, n)
+
+print('encrypted with private exponent ', c)
+
+m = pow(c, e, n)
+print('decrypted/original data ', m)
 
 """
 -----BEGIN RSA PRIVATE KEY-----
