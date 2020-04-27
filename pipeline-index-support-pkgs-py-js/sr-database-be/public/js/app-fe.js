@@ -122,6 +122,8 @@ $(document).ready(function () {
         var plthtml = stat_plt(s, e);
         var bldhtml = stat_bld(s, e);
         $("#stats").html('<div class="row">' + plthtml + bldhtml + '</div')
+        this.style.display= "none";
+        $("#stat_date")[0].style.display = "none";
     });
     $(function () {
         $(".datepicker").datepicker({
