@@ -1,5 +1,5 @@
-basic-login-form                  
-basic-upload-file-to-server      
+basic-login-form                  : basic html/css/js for login page
+basic-upload-file-to-server       : test merge
 bcc-ebpf                           
 bootstrap-4-glozzom                
 bootstrap-4-looplab                
