@@ -1,5 +1,5 @@
-basic-login-form                  
-basic-upload-file-to-server      
+basic-login-form                  :
+basic-upload-file-to-server       : html/css/js for uploading a file
 bcc-ebpf                           
 bootstrap-4-glozzom                
 bootstrap-4-looplab                
