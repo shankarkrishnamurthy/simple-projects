@@ -11,7 +11,7 @@
 # Copyright (C) 2016 Sasha Goldshtein.
 
 from __future__ import print_function
-from bcc import BPF, USDT, StrcmpRewrite
+from bcc import BPF, USDT #, StrcmpRewrite
 from functools import partial
 from time import sleep, strftime
 import time
@@ -270,10 +270,10 @@ class Probe(object):
                 # Remove @user occurrences from arg before resolving to its
                 # corresponding aliases.
                 expr = re.sub(r'(arg[1-6])@user', r'\1', expr)
-                rdict = StrcmpRewrite.rewrite_expr(expr,
-                            self.bin_cmp, self.library,
-                            self.probe_user_list, self.streq_functions,
-                            Probe.streq_index)
+                #rdict = StrcmpRewrite.rewrite_expr(expr,
+                            #self.bin_cmp, self.library,
+                            #self.probe_user_list, self.streq_functions,
+                            #Probe.streq_index)
                 expr = rdict["expr"]
                 self.streq_functions = rdict["streq_functions"]
                 Probe.streq_index = rdict["probeid"]

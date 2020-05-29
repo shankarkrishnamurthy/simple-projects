@@ -86,7 +86,7 @@ class Probe(object):
         return self.type == b"t" or (self.type == b"p" and self.library == b"")
 
     def attach(self):
-        print (self.type, self.trace_functions.items())
+        #print (self.type, self.trace_functions.items()) # print probed func SHANKAR
         if self.type == b"p" and not self.library:
             for index, function in self.trace_functions.items():
                 try:
@@ -176,20 +176,32 @@ class Probe(object):
 
     def load(self):
         trace_count_text = b"""
-int PROBE_FUNCTION(void *ctx) {
+int PROBE_FUNCTION(struct pt_regs *ctx) {
     FILTER
     int loc = LOCATION;
     u64 *val = counts.lookup(&loc);
-    if (!val) {
-        return 0;   // Should never happen, # of locations is known
-    }
+    if (!val) { return 0; }
     (*val)++;
+
+    if (1 == *val) { // if its 1st time
+        u32 v = 0;
+        u32 *i = idx.lookup(&v); // lookup free index
+        if (i) {
+            val = order.lookup(i);
+            if (val) { (*val) = loc; }
+        }
+        idx.increment(v);
+    }
+
     return 0;
 }
         """
         bpf_text = b"""#include <uapi/linux/ptrace.h>
+#include <linux/sched.h>
 
 BPF_ARRAY(counts, u64, NUMLOCATIONS);
+BPF_ARRAY(order, u64, NUMLOCATIONS);
+BPF_ARRAY(idx, u32, 1);
         """
 
         # We really mean the tgid from the kernel's perspective, which is in
@@ -212,8 +224,11 @@ BPF_ARRAY(counts, u64, NUMLOCATIONS);
                             self.pattern)
 
         self.bpf = BPF(text=bpf_text,
-                       usdt_contexts=[self.usdt] if self.usdt else [])
+                       usdt_contexts=[self.usdt] if self.usdt else [],debug=0x00) # SHANKAR debug
         self.clear()    # Initialize all array items to zero
+
+    def order(self):
+        return self.bpf["order"]
 
     def counts(self):
         return self.bpf["counts"]
@@ -254,6 +269,8 @@ class Tool(object):
             help="use regular expressions. Default is \"*\" wildcards only.")
         parser.add_argument("-D", "--debug", action="store_true",
             help="print BPF program before starting (for debugging purposes)")
+        parser.add_argument("-o", "--order", action="store_true",
+            help="Show the count in the order of the call")
         parser.add_argument("pattern",
             type=ArgString,
             help="search expression for events")
@@ -292,15 +309,21 @@ class Tool(object):
             if self.args.timestamp:
                 print("%-8s\n" % strftime("%H:%M:%S"), end="")
 
-            print("%-36s %8s" % ("FUNC", "COUNT"))
             counts = self.probe.counts()
-            for k, v in sorted(counts.items(),
-                               key=lambda counts: counts[1].value):
-                if v.value == 0:
-                    continue
-                print("%-36s %8d" %
-                      (self.probe.trace_functions[k.value], v.value))
-
+            if not self.args.order:
+                print("%-36s %8s" % ("FUNC", "COUNT"))
+                for k, v in sorted(counts.items(),
+                                key=lambda counts: counts[1].value):
+                    if v.value == 0:
+                        continue
+                    print("%-36s %8d" %
+                        (self.probe.trace_functions[k.value], v.value))
+            else: 
+                order = self.probe.order()
+                print("Call Order:")
+                for k, v in order.items():
+                    print("%d \t %-36s (%d)" % (k.value,self.probe.trace_functions[v.value], counts[v].value))
+            
             if exiting:
                 print("Detaching...")
                 exit()
