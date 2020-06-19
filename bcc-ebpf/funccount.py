@@ -18,6 +18,7 @@
 from __future__ import print_function
 from bcc import ArgString, BPF, USDT
 from time import sleep, strftime
+from ctypes import *
 import argparse
 import os
 import re
@@ -187,7 +188,7 @@ int PROBE_FUNCTION(struct pt_regs *ctx) {
         u32 v = 0;
         u32 *i = idx.lookup(&v); // lookup free index
         if (i) {
-            val = order.lookup(i);
+            v = (*i);val = order.lookup(&v);
             if (val) { (*val) = loc; }
         }
         idx.increment(v);
@@ -229,6 +230,11 @@ BPF_ARRAY(idx, u32, 1);
 
     def order(self):
         return self.bpf["order"]
+
+    def initorder(self):
+        order = self.order()
+        for k, v in order.items():
+            order[k] = c_int(-1)
 
     def counts(self):
         return self.bpf["counts"]
@@ -289,6 +295,7 @@ class Tool(object):
 
     def run(self):
         self.probe.load()
+        self.probe.initorder()
         self.probe.attach()
         print("Tracing %d functions for \"%s\"... Hit Ctrl-C to end." %
               (self.probe.matched, bytes(self.args.pattern)))
@@ -320,8 +327,9 @@ class Tool(object):
                         (self.probe.trace_functions[k.value], v.value))
             else: 
                 order = self.probe.order()
-                print("Call Order:")
+                print("Call Order(%d):" % len(self.probe.trace_functions))
                 for k, v in order.items():
+                    if v.value >= len(self.probe.trace_functions): continue
                     print("%d \t %-36s (%d)" % (k.value,self.probe.trace_functions[v.value], counts[v].value))
             
             if exiting:

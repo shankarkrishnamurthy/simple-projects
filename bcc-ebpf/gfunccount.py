@@ -28,6 +28,7 @@ import signal
 
 class gfunccount:
     def __init__(self):
+        os.system("mount -t debugfs none /sys/kernel/debug/ 2>/dev/null")
         signal.signal(signal.SIGINT, self.sighand)
         parser = optparse.OptionParser()
         parser.add_option('-d','--duration', help="duration of capture" )
@@ -42,11 +43,14 @@ class gfunccount:
         self.prerun, self.fn = {}, {}
         
         #defaults
-        self.dur = int(options.duration) if options.duration else 10
-        self.sort = options.sort if options.sort else 'hit'
+        self.dur = 10
+        if options.duration: self.dur = int(options.duration)
+        self.sort = 'hit'
+        if options.sort: self.sort = options.sort
         #self.cpu = options.cpu if options.cpu else 'all'
         self.excl,self.rev,self.cmd,self.tot = options.exclusive,options.reverse,options.command,options.showtot
-        self.int = int(options.interval) if options.interval else 1
+        self.int = 1
+        if options.interval: self.int = int(options.interval)
         if self.sort not in ('hit','tim','avg'):
             parser.error("Option sort : either hit, tim, avg")
             sys.exit(1)
@@ -83,7 +87,8 @@ class gfunccount:
         if self.tot: print("Total: ",cnt)
 
     def process(self, f, c):
-        with open(f) as fp:        
+        fp = open(f,'r')
+        try:
             l = fp.readline()
             while l:
                 m = re.search(r'(\S+)\s+(\d+).*?(\d+).*?(\d+).*?(\d+)', l)
@@ -97,6 +102,8 @@ class gfunccount:
                     h['tim'] = h.get('tim',0) + int(m.group(3)) # sum of time
                     h['avg'] = float(h['tim']) / h['hit']
                 l = fp.readline()
+        finally:
+            fp.close()
 
     def iterate(self, fn=None):
         dir = "/sys/kernel/debug/tracing/trace_stat/"
@@ -111,8 +118,9 @@ class gfunccount:
 
     def run(self):
         self.preprocess()
-
-        print("HIT CTRL-C to stop. Running '%s'" % (self.cmd if self.cmd else 'sleep '+ str(self.dur)))
+        if not self.cmd: tmpstr = 'sleep ' + str(self.dur)
+        else: tmpstr = self.cmd
+        print("HIT CTRL-C to stop. Running '%s'" % tmpstr)
         self.enable()
         if self.cmd:
             os.system(self.cmd)
