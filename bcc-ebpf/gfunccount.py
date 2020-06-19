@@ -21,6 +21,7 @@
 #
 
 import os,sys
+import multiprocessing
 import time
 import optparse
 import re
@@ -32,10 +33,10 @@ class gfunccount:
         signal.signal(signal.SIGINT, self.sighand)
         parser = optparse.OptionParser()
         parser.add_option('-d','--duration', help="duration of capture" )
-        parser.add_option('-C','--cpu', action="append", help="functions only on this cpu")
+        parser.add_option('-c','--cpu', action="append", help="functions only on this cpu")
         parser.add_option('-s','--sort', help="hit/tim/avg")
         parser.add_option('-e','--exclusive',default=False, action="store_true", help="total fn ran - fns ran 1 second before")
-        parser.add_option('-c','--command', help="command to run for capture")
+        parser.add_option('-C','--command', help="command to run for capture")
         parser.add_option('-i','--interval', help="prerun time before capture")
         parser.add_option('-r','--reverse',default=False, action="store_true",  help="reverse the Sort")
         parser.add_option('-t','--showtot',default=True, action="store_false",  help="show total fn")
@@ -47,7 +48,10 @@ class gfunccount:
         if options.duration: self.dur = int(options.duration)
         self.sort = 'hit'
         if options.sort: self.sort = options.sort
-        self.cpu = set(map(int,options.cpu)) if options.cpu else os.sched_getaffinity(0)
+        try:
+            self.cpu = set(map(int,options.cpu)) if options.cpu else os.sched_getaffinity(0)
+        except:
+            self.cpu = set(range(multiprocessing.cpu_count()))
         self.excl,self.rev,self.cmd,self.tot = options.exclusive,options.reverse,options.command,options.showtot
         self.int = 1
         if options.interval: self.int = int(options.interval)
