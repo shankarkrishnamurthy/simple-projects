@@ -35,7 +35,7 @@ def verify_limit(num):
                         (probe_limit, num))
 
 class Probe(object):
-    def __init__(self, pattern, use_regex=False, pid=None):
+    def __init__(self, pattern, use_regex=False, pid=None, cpu=None):
         """Init a new probe.
 
         Init the probe from the pattern provided by the user. The supported
@@ -80,6 +80,7 @@ class Probe(object):
             self.library = libpath
 
         self.pid = pid
+        self.cpu = cpu
         self.matched = 0
         self.trace_functions = {}   # map location number to function name
 
@@ -87,7 +88,8 @@ class Probe(object):
         return self.type == b"t" or (self.type == b"p" and self.library == b"")
 
     def attach(self):
-        #print (self.type, self.trace_functions.items()) # print probed func SHANKAR
+        if debug:
+            print (self.type, self.trace_functions.items())
         if self.type == b"p" and not self.library:
             for index, function in self.trace_functions.items():
                 try:
@@ -212,13 +214,17 @@ BPF_ARRAY(idx, u32, 1);
                 b"""u32 pid = bpf_get_current_pid_tgid() >> 32;
                    if (pid != %d) { return 0; }""" % self.pid)
         else:
-            trace_count_text = trace_count_text.replace(b'FILTER', b'')
+            if self.cpu != None:
+                trace_count_text = trace_count_text.replace(b'FILTER',
+                b"""u32 cpu = bpf_get_smp_processor_id();
+                   if (cpu != %d) { return 0; }""" % self.cpu)
+            else:
+                trace_count_text = trace_count_text.replace(b'FILTER', b'')
 
         bpf_text += self._generate_functions(trace_count_text)
         bpf_text = bpf_text.replace(b"NUMLOCATIONS",
                                     b"%d" % len(self.trace_functions))
-        if debug:
-            print(bpf_text)
+        if debug: print(bpf_text.decode("utf-8"))
 
         if self.matched == 0:
             raise Exception("No functions matched by pattern %s" %
@@ -265,6 +271,8 @@ class Tool(object):
             epilog=examples)
         parser.add_argument("-p", "--pid", type=int,
             help="trace this PID only")
+        parser.add_argument("-c", "--cpu", type=int,
+            help="trace this CPU only")
         parser.add_argument("-i", "--interval",
             help="summary interval, seconds")
         parser.add_argument("-d", "--duration",
@@ -283,7 +291,7 @@ class Tool(object):
         self.args = parser.parse_args()
         global debug
         debug = self.args.debug
-        self.probe = Probe(self.args.pattern, self.args.regexp, self.args.pid)
+        self.probe = Probe(self.args.pattern, self.args.regexp, pid=self.args.pid,cpu=self.args.cpu)
         if self.args.duration and not self.args.interval:
             self.args.interval = self.args.duration
         if not self.args.interval:

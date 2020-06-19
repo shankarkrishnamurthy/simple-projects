@@ -32,7 +32,7 @@ class gfunccount:
         signal.signal(signal.SIGINT, self.sighand)
         parser = optparse.OptionParser()
         parser.add_option('-d','--duration', help="duration of capture" )
-        #parser.add_option('-c','--cpu', help="functions only on this cpu")
+        parser.add_option('-C','--cpu', action="append", help="functions only on this cpu")
         parser.add_option('-s','--sort', help="hit/tim/avg")
         parser.add_option('-e','--exclusive',default=False, action="store_true", help="total fn ran - fns ran 1 second before")
         parser.add_option('-c','--command', help="command to run for capture")
@@ -47,7 +47,7 @@ class gfunccount:
         if options.duration: self.dur = int(options.duration)
         self.sort = 'hit'
         if options.sort: self.sort = options.sort
-        #self.cpu = options.cpu if options.cpu else 'all'
+        self.cpu = set(map(int,options.cpu)) if options.cpu else os.sched_getaffinity(0)
         self.excl,self.rev,self.cmd,self.tot = options.exclusive,options.reverse,options.command,options.showtot
         self.int = 1
         if options.interval: self.int = int(options.interval)
@@ -73,12 +73,12 @@ class gfunccount:
             self.enable()
             time.sleep(self.int)
             self.disable()
-            self.iterate(gfn.process)
+            self.iterate(self.process)
             self.prerun = self.fn
             self.fn = {}
 
     def postprocess(self):
-        self.iterate(gfn.process)
+        self.iterate(self.process)
         cnt=0
         for k,v in sorted(self.fn.items(), key=lambda i: i[1][self.sort], reverse=self.rev):
             if k in self.prerun: continue
@@ -87,6 +87,7 @@ class gfunccount:
         if self.tot: print("Total: ",cnt)
 
     def process(self, f, c):
+        if int(c) not in self.cpu: return # skip non-interesting cpus
         fp = open(f,'r')
         try:
             l = fp.readline()

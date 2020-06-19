@@ -17,13 +17,13 @@ class myObj(TimerIntf):
     def __init__(self, name):
         self.name = "Timer-" + str(name)
     def run(self, to):
-        print self.name , " My timer expired @ run() ", to
+        print(self.name , " My timer expired @ run() ", to)
 
 class myTimeout(object):
     _shared = None
     def __new__(cls):
         if not cls._shared:
-            cls._shared = object.__new__(cls,myTimeout)
+            cls._shared = super(myTimeout,cls).__new__(cls)
         return cls._shared
 
     def __init__(self):
@@ -45,7 +45,7 @@ class myTimeout(object):
         for v in cl:
           for i in list(lq):
             if i[1]._id == v:
-                print '   (timer removed ', v, ')'
+                print('   (timer removed ', v, ')')
                 lq.remove((i))
                 heapq.heapify(lq)
 
@@ -96,12 +96,12 @@ class myTimeout(object):
         
 
 def inthandler(signum, frame):
-    print "User Terminated. Exiting ...", current_process().pid, current_process().name
+    print("User Terminated. Exiting ...", current_process().pid, current_process().name)
     sys.exit(0)
 
 if __name__ == "__main__":
     thlist = []
-    print 'Testing Timer Infra (time=',time.time(),')'
+    print('Testing Timer Infra (time=',time.time(),')')
     MAXTIME,NEVT=10,10
 
     signal.signal(signal.SIGINT, inthandler)
@@ -115,13 +115,13 @@ if __name__ == "__main__":
         # Insert a time to wait with TimerIntf Object
         th = t.callAfterTimeoutSecs(ti,obj)
         thlist.append(th)
-        print ' Creating ', i, ' timer ', th.name, ' fires after ', ti, ' secs @ ', th._tc
+        print(' Creating ', i, ' timer ', th.name, ' fires after ', ti, ' secs @ ', th._tc)
 
     time.sleep(random.randint(1,3))
     rl = random.sample(thlist, NEVT/2)
     for i in rl:
         # Pick a timer index and cancel
-        print i.name,' Cancelling ', i._id, ' timer @ ', i._tc
+        print(i.name,' Cancelling ', i._id, ' timer @ ', i._tc)
         t.cancelPendingTimeout(i)
 
     time.sleep(MAXTIME+1)

@@ -12,14 +12,14 @@ class myObj(TimerIntf):
     def __init__(self, name):
         self.name = "Timer-" + str(name)
     def run(self, to):
-        print self.name , " My timer expired @ run() ", to
+        print(self.name , " My timer expired @ run() ", to)
 
 # Can also make this singleton
 class myTimeout(object):
     _shared = None
     def __new__(cls):
         if not cls._shared:
-            cls._shared = object.__new__(cls,myTimeout)
+            cls._shared = super(myTimeout, cls).__new__(cls)
         return cls._shared
         
     def __init__(self):
@@ -36,7 +36,7 @@ class myTimeout(object):
         self.qlock.acquire()
         heapq.heappush(self.q, (tc, obj))
         self.qlock.release()
-        print "(qlen %d) "% len(self.q),' timeout ',to, '({})'.format(tc)
+        print("(qlen %d) "% len(self.q),' timeout ',to, '({})'.format(tc))
         self.evt.set()
     
     def waitEvent(self):
@@ -56,7 +56,7 @@ class myTimeout(object):
                 if tw: heapq.heappush(self.q, (to,obj))
             
 def inthandler(signum, frame):
-    print "Exiting ..."
+    print("Exiting ...")
     sys.exit(0)
 
 if __name__ == "__main__":
