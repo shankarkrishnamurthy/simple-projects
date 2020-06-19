@@ -193,7 +193,7 @@ int PROBE_FUNCTION(struct pt_regs *ctx) {
             v = (*i);val = order.lookup(&v);
             if (val) { (*val) = loc; }
         }
-        idx.increment(v);
+        idx.increment(0);
     }
 
     return 0;
