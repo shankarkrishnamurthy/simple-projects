@@ -1,25 +1,36 @@
+/*
+    Description: Simple lexical anaylyzer for a query (similar to JIRA Query)
+    Author: Shankar, K
+    Date: Jun 2020
+*/
 %{
 #include<stdio.h>
-#include "query.tab.h"
-
+#include<string.h>
+#include "query.tab.h" // Redefinition/Independent definition leads to weird problems
 %}
 %option noyywrap yylineno nodefault
 
 %%
 
-"||"|"|"|"&&"|"&"                       {return LOP;}
-">="|">"|"<"|"<="|"="|"!="|"=="         {return CMP;}
-[0-9]+                                  {return NUM;}
-[a-zA-z]+                               {return STR;}
-0x[0-9a-fA-F]                           {return HEX;}
-"("                                     {printf("OPP\n");return OPP;}
-")"                                     {return CLP;}
+<<EOF>>                                 {return ENDF; /* ^D for stdin (or) EOF for file */}
+"||"|"|"|"&&"|"&"                       {yylval.s = strdup(yytext);return LOP;}
+">="|">"|"<"|"<="|"="|"!="|"=="         {yylval.s = strdup(yytext);return CMP;}
+[0-9]+                                  {yylval.s = strdup(yytext);return NUM;}
+[a-zA-z]+                               {yylval.s = strdup(yytext);return STR;}
+0x[0-9a-fA-F]                           {yylval.s = strdup(yytext);return HEX;}
+"("                                     {yylval.s = strdup(yytext);return OPP;}
+")"                                     {yylval.s = strdup(yytext);return CLP;}
 [ \t]                                   {}
-[\n.]                                   {return yytext[0];}
-
+.|\n                                    {yylval.s = strdup(yytext);return yytext[0];}
 %%
 
-#if 0
+int yyerror(char *s)
+{
+    fprintf(stderr, "error %d: %s at %s\n", yylineno, s, yytext);
+    return 0;
+}
+
+#if STAND_ALONE_LEX
 static int process()
 {
     int rc;
@@ -43,13 +54,6 @@ int main(int argc, char **argv)
 end:
 	return 0;
 }
-
 #endif
 
-
-int yyerror(char *s)
-{
-    fprintf(stderr, "error %d: %s at %s\n", yylineno, s, yytext);
-    return 0;
-}
 
