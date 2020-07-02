@@ -1,3 +1,4 @@
+#!/bin/env python2
 import md5
 import hashlib
 import struct
@@ -43,4 +44,4 @@ print 'Before(Hex/Base16) :',binascii.hexlify(b.raw)
 _lib = c.CDLL('./libmain.so')
 _lib.changestr.argtypes = [c.c_char_p,c.c_int,]
 _lib.changestr(b,ts.size)
-print 'After(Hex/Base16) :',binascii.hexlify(b.raw)
+print 'After(Hex/Base16) :',binascii.hexlify(b.raw),b
