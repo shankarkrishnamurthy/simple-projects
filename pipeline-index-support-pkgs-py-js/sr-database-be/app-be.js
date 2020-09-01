@@ -160,7 +160,7 @@ function updatejira(d, srdb) {
         protocol: 'https',
         host: 'issues.citrite.net',
         username: 'svcacct_jira_odsbo',
-        password: 'eCr7!wSg8%lKj7!M'
+        password: '9qFx%3oJ(S*$f38o'
     });
     var qstr = "project=NSHELP AND cf[20330] ~ " + d.sr
     var qopt = {
