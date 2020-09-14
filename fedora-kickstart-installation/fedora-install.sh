@@ -1,13 +1,15 @@
 #!/bin/bash
 # 
 # Description:
-#       Simple script which takes live fedora ISO and creates a VM
-#   without manual intervention
+#       Simple script which takes live fedora ISO and creates 
+#       a VM with that installation without manual intervention
 #
-#   Step 1: create a minimalist disk. Loop mount it
-#   Step 2: create kickstart with minimal config
-#   Step 3: invoke anaconda on this kickstart
-#   Step 4: Run virt-install to import this disk
+#       Not much error checks are done. Use at your peril
+#
+#   Step 1: create disk img. Give it to VM along with installation iso
+#   Step 2: create kickstart with minimal config (pre-done)
+#   Step 3: mount disks in VM. Invoke anaconda on this kickstart file remotely
+#   Step 4: Run virt-install to import this disk once successfully done
 #
 
 if [[ -z "$1" ]]; then
