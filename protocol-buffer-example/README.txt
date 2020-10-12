@@ -5,7 +5,7 @@ Resource:
     
     https://developers.google.com/protocol-buffers/docs/pythontutorial 
 steps:
-
+ - dnf install -y protobuf-compiler
  - pip install protobuf
  - protoc -I=. --python_out=. ./addr.proto 
  - import addr_pb2.py
