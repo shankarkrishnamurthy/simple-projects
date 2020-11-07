@@ -28,8 +28,12 @@ import re
 import signal
 
 class gfunccount:
+    def call(o,cmd):
+        rc = os.system(cmd)
+        print('rc ', rc,' cmd: ', cmd)
+        return rc
     def __init__(self):
-        os.system("mount -t debugfs none /sys/kernel/debug/ 2>/dev/null")
+        self.call("mount -t debugfs none /sys/kernel/debug/ 2>/dev/null")
         signal.signal(signal.SIGINT, self.sighand)
         parser = optparse.OptionParser()
         parser.add_option('-d','--duration', help="duration of capture" )
@@ -65,13 +69,14 @@ class gfunccount:
         sys.exit(0)
 
     def enable(self): # enable stat collection echo 1 > function_profile_enabled
-        os.system("echo 1 > /sys/kernel/debug/tracing/function_profile_enabled")
+        self.call("echo 1 > /sys/kernel/debug/tracing/function_profile_enabled")
+        self.call("echo > /sys/kernel/debug/tracing/set_ftrace_filter")
 
     def disable(self):
-        os.system("echo 0 > /sys/kernel/debug/tracing/function_profile_enabled")
+        self.call("echo 0 > /sys/kernel/debug/tracing/function_profile_enabled")
 
     def preprocess(self):
-        os.system("echo 0 > /sys/kernel/debug/tracing/options/sleep-time")
+        self.call("echo 0 > /sys/kernel/debug/tracing/options/sleep-time 2>/dev/null")
         self.prerun = {}
         if self.excl:
             self.enable()
@@ -128,7 +133,7 @@ class gfunccount:
         print("HIT CTRL-C to stop. Running '%s'" % tmpstr)
         self.enable()
         if self.cmd:
-            os.system(self.cmd)
+            self.call(self.cmd)
         else:
             time.sleep(self.dur)
         self.disable()
