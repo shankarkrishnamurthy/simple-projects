@@ -1,0 +1,39 @@
+{
+  "builders": [
+    {
+      "iso_checksum": "sha256:225ebc160e40bb43c5de28bad9680e3a78a9db40c9e3f4f42f3ee3f10f95dbeb",
+      "iso_urls": "https://download.fedoraproject.org/pub/fedora/linux/releases/31/Server/x86_64/iso/Fedora-Server-dvd-x86_64-31-1.9.iso",
+      "boot_command": [
+        "<tab> linux text biosdevname=0 ks=http://{{ .HTTPIP }}:{{ .HTTPPort}}/fedora31-kickstart.cfg<enter><enter>"
+      ],
+
+      "accelerator": "kvm",
+      "disk_size": "25480M",
+      "format": "qcow2",
+      "headless": "true",
+      "http_directory": ".",
+      "type": "qemu",
+      "vm_name": "packer-fedora31-v{{ isotime \"20060102150405\" }}",
+      "output_directory": "fedora-img",
+      "net_device": "virtio-net",
+      "disk_interface": "virtio",
+      "boot_wait": "10s",
+      "ssh_username": "root",
+      "ssh_password": "CHANGEME",
+      "ssh_timeout": "20m",
+      "ssh_port": 22,
+      "shutdown_command": "shutdown -P now",
+      "shutdown_timeout": "10m",
+      "qemuargs": [
+        [
+          "-m",
+          "2048M"
+        ],
+        [
+          "-smp",
+          "cpus=1,maxcpus=16,cores=4"
+        ]
+      ]
+    }
+  ]
+}

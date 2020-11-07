@@ -1,0 +1,31 @@
+---
+  - name: play 1
+    hosts: all
+    gather_facts: false
+    remote_user: ec2-user
+    vars:
+      ansible_ssh_private_key_file: /root/kp-ncal-ramanjaneyu.pem
+      ansible_python_interpreter: /bin/env python
+      stdout_callback: dense
+
+    tasks:
+
+      - name: wait for conn
+        wait_for_connection:
+          timeout: 10
+
+      #- name: ping test
+         #ping:
+
+      - name: Get the zone
+        uri:
+          url: "{{ GAURL }}/zone.txt"
+          method: GET
+          return_content: yes
+        register: showzone
+
+      - name: show zone
+        debug: var=showzone.content
+          
+
+...

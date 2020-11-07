@@ -1,0 +1,3 @@
+variable "userdata" {
+    type = string
+}
