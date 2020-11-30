@@ -158,8 +158,8 @@ function processdata(x) {
 function updatejira(d, srdb) {
     var j = new J({
         protocol: 'https',
-        host: 'issues.citrite.net',
-        username: 'svcacct_jira_odsbo',
+        host: '<url>'
+        username: '<user>',
         password: '<password here>'
     });
     var qstr = "project=NSHELP AND cf[20330] ~ " + d.sr
