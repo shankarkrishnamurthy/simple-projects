@@ -29,4 +29,12 @@ Steps:
         kubectl apply -f my-cm.yaml
         verify pod restarted
         
-       
+    5. Cleanup:
+        kubectl delete -f my-operator-deploy.yaml 
+        kubectl delete -f my-app-deploy.yaml 
+        kubectl delete -f my-custom-defn.yaml
+        kubectl delete -f my-crd.yaml 
+        kubectl delete -f my-cm.yaml 
+        kubectl delete -f my-clusterrolebinding.yaml 
+        kubectl delete -f my-serviceaccount.yaml 
+        

@@ -25,14 +25,15 @@ spec:
               additionalProperties:
                 type: string
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: config-monitor-crd
-rules:
-- apiGroups:
-  - shankar.com
-  resources:
-  - configmonitor
-  - configmonitor/finalizers
-  verbs: [ get, list, create, update, delete, deletecollection, watch ]
+# Not needed if you have cluster-admin role bound to service a/c
+#apiVersion: rbac.authorization.k8s.io/v1
+#kind: Role
+#metadata:
+  #name: config-monitor-crd
+#rules:
+#- apiGroups:
+  #- shankar.com
+  #resources:
+  #- configmonitor
+  #- configmonitor/finalizers
+  #verbs: [ get, list, create, update, delete, deletecollection, watch ]
