@@ -2,14 +2,14 @@
 
 set -e
 set -x
-VER=29
 
 function cleanup {
     echo "Fedora Upgrade to Fedora-${VER} Failed"
     set +x
 }
 trap cleanup EXIT
-
+[[ -z "$VER" ]] && echo "Version is empty $VER . Provide one." && exit 0
+echo Upgrading to $VER
 
 dnf upgrade --refresh -y
 
