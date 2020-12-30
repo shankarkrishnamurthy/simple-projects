@@ -1,0 +1,22 @@
+---
+
+  - name: play for configuring master node
+    hosts: localhost
+    gather_facts: false
+    vars:
+      ansible_ssh_private_key_file: /root/kp-ncal-ramanjaneyu.pem
+      region: 'us-west-1'
+      undo: false
+
+    tasks:
+    - name: find master node
+      ec2_instance_info:
+        filters:
+          "tag:nodetype": master
+      register: mnode
+    - set_fact:
+        ip: '{{mnode.instances[0].public_ip_address}}'
+    - debug:
+        var: ip
+    - shell: echo '{{ip}}' > /etc/ansible/hosts
+      tags: print
