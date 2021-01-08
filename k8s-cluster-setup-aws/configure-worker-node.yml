@@ -77,5 +77,10 @@
         tags: reboot
       - shell:
           cmd: '{{joincmd.0}}'
-        tags: joincmd
+        tags: joincmd,post-reboot
+      - copy:
+          src: /home/fedora/.ssh/authorized_keys
+          dest: /root/.ssh
+          remote_src: yes
+        tags: copy-key,post-reboot
 

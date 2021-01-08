@@ -71,8 +71,14 @@
 
       - shell: systemctl enable --now docker
       - shell: systemctl enable --now kubelet
+      - copy:
+          src: /home/fedora/.ssh/authorized_keys
+          dest: /root/.ssh
+          remote_src: yes
+        tags: copy-key
+
       - reboot:
-          reboot_timeout: 60
+          reboot_timeout: 90
         tags: reboot
       
       - name: start kubeadm
@@ -92,6 +98,6 @@
 
       - shell: kubeadm token create --print-join-command
         register: joincmd
-        tags: joincmd
+        tags: joincmd,post-reboot
       - local_action: copy content={{joincmd.stdout_lines}} dest=worker-join.cmd
         tags: save-join-cmd,post-reboot

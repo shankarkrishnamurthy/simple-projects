@@ -33,7 +33,8 @@
       when: undo == true
 
     - name: Find right AMI
-      when: mnode.instances[0] is not defined
+      when: 
+        - (mnode.instances[0] is not defined) or (mnode.instances[0] is defined and mnode.instances[0].state.name !="running")
       ec2_ami_info:
         filters:
           name: "Fedora-Cloud-Base-33-*x86_64*hvm*gp2*"
@@ -70,3 +71,5 @@
         echo '{{item.public_ip}}' >>  /etc/ansible/hosts
       with_items: '{{ec2_inst_var.instances}}'
       tags: save-ip
+    - local_action: shell aws ec2 modify-instance-attribute --instance-id='{{item.id}}' --no-source-dest-check
+      with_items: '{{ec2_inst_var.instances}}'

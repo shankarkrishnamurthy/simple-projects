@@ -71,3 +71,4 @@
         echo '[master]
         {{ip}}' > /etc/ansible/hosts
       tags: write-ip 
+    - local_action: shell aws ec2 modify-instance-attribute --instance-id='{{ec2_inst_var.instances[0].id}}' --no-source-dest-check
