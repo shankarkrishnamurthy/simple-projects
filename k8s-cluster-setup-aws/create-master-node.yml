@@ -65,10 +65,12 @@
       tags: ['create-master','print']
     - set_fact:
         ip: '{{ec2_inst_var.instances[0].public_ip}}'
+      name: set fact to save to file
     - debug:
         var: ip
     - shell: | 
         echo '[master]
         {{ip}}' > /etc/ansible/hosts
       tags: write-ip 
+      name: add instance ip into /etc/ansible/hosts
     - local_action: shell aws ec2 modify-instance-attribute --instance-id='{{ec2_inst_var.instances[0].id}}' --no-source-dest-check

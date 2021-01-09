@@ -1,0 +1,85 @@
+---
+- name: Create a new vpx EC2 instance with 1 NIC
+  hosts: localhost
+  gather_facts: False
+
+  vars:
+      region: us-west-1
+      instance_type: m5.xlarge
+      keypair: kp-ncal-ramanjaneyu
+      undo: false
+
+  tasks:
+    # Currently the module returns AMI in order of creation time
+    # And 'Customer Licensed' happens to be created 1st. But this can change. Had to watch out.
+    # (or) find better way to find Customer Licensed VPX
+    - name: Delete VPX
+      when: 
+        - undo == true
+      ec2_instance_info:
+        filters:
+          "tag:type": vpx
+      register: vpx
+      tags: delete
+    - name: Delete VPX
+      when: 
+        - undo == true
+      ec2:
+        region: "{{region}}"
+        instance_ids: "{{item.instance_id}}"
+        state: absent
+      tags: delete
+      with_items: "{{vpx.instances}}"
+    - meta: end_play
+      when: undo == true
+
+    - name: Find right AMI
+      when: 
+      ec2_ami_info:
+        owners: aws-marketplace
+        filters:
+          name: "Citrix ADC 13.0-71.44*"
+      register: ami_find
+    - debug:
+        #var: ami_find
+        msg: "{{ami_find.images[0].image_id }}"
+
+    - name: find Subnets
+      ec2_vpc_subnet_info:
+        filters:
+          default-for-az: ["true"]
+      register: subnets
+      tags: subnets
+    - debug:
+        msg: "{{subnets.subnets[0].subnet_id}}"
+      tags: subnets
+
+    - name: Create an ec2 instance
+      when: subnets and ami_find
+      ec2:
+         instance_type: "{{ instance_type }}"
+         image: "{{ ami_find.images[0].image_id }}"
+         wait: true
+         region: "{{ region }}"
+         vpc_subnet_id: "{{ subnets.subnets[0].subnet_id }}"
+         assign_public_ip: yes
+         count: 1
+         key_name: "{{ keypair }}"
+         instance_tags: { "type" : "vpx" }
+      register: ec2inst
+
+      # post creation of vpx
+    - ec2_instance_info:
+        instance_ids: "{{ ec2inst.instances[0].id }}"
+      register: ec2inst # Overwrite as previous one doesn't have eni info
+    - debug:
+        var: ec2inst
+    - name: assign two more private IPs
+      ec2_eni:
+        region: "{{region}}"
+        subnet_id: "{{ subnets.subnets[0].subnet_id }}"
+        eni_id: "{{ec2inst.instances[0].network_interfaces[0].network_interface_id}}"
+        secondary_private_ip_address_count: 2
+      register: createdip
+    - debug:
+        var: createdip
