@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: bdgreeter
+ labels:
+   app: bdgreeter
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: bdgreeter
+ template:
+   metadata:
+     labels:
+       app: bdgreeter
+   spec:
+     containers:
+     - name: app
+       image: magalixcorp/birthdaygreeter
+     - name: envoy
+       image: envoyproxy/envoy-alpine:v1.17-latest
+       env:
+       - name: ENVOY_UID
+         value: "0"
+       args:
+         - "-c"
+         - "/envoy-config/envoy.yaml"
+       volumeMounts:
+         - name: envoy-config
+           mountPath: /envoy-config
+     volumes:
+     - name: envoy-config
+       configMap:
+         name: envoyconfig
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: bdgreeter-svc
+spec:
+ selector:
+   app: bdgreeter
+ ports:
+ - name: http
+   port: 80
+   targetPort: 80
+   protocol: TCP
+ - name: admin
+   port: 8081
+   targetPort: 8081
+ type: LoadBalancer
+
