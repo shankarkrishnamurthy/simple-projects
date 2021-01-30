@@ -4,7 +4,7 @@
     hosts: localhost
     gather_facts: false
     vars:
-      region: 'us-west-1'
+      region: 'us-west-2'
       undo: false
 
     tasks:
@@ -37,11 +37,12 @@
         filters:
           name: "Fedora-Cloud-Base-33-*x86_64*hvm*gp2*"
       register: ami_find
+      tags: find-ami
 
     - name: ami image print
       debug:
         var: ami_find.images[0]
-      tags: print
+      tags: print,find-ami
       when: ami_find.images[0] is defined
 
     - name: Create & Start instance of above AMI
