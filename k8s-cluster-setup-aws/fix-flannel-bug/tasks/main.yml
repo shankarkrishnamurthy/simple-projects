@@ -1,0 +1,11 @@
+---
+      - shell:
+          cmd: |
+            cat <<EOF | tee /etc/systemd/network/50-flannel.link
+            [Match]
+            OriginalName=flannel*
+            [Link]
+            MACAddressPolicy=none 
+        tags: flannel-fix
+
+

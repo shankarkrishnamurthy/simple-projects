@@ -1,0 +1,8 @@
+---
+      - copy:
+          src: /home/fedora/.ssh/authorized_keys
+          dest: /root/.ssh
+          remote_src: yes
+        tags: copy-key
+
+

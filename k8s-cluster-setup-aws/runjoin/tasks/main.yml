@@ -1,0 +1,5 @@
+---
+      - shell:
+          cmd: '{{joincmd.0}}'
+        tags: joincmd,post-reboot
+

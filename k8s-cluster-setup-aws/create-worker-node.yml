@@ -4,76 +4,20 @@
     hosts: localhost
     gather_facts: false
     vars:
-      region: 'us-west-2'
-      inst_count: 1
+      region: 'us-west-1'
+      inst_count: 2
       type: "worker"
       undo: false
 
-    tasks:
-    - name: check for {{type}}
-      ec2_instance_info:
-        filters:
-          "tag:nodetype": "{{type}}"
-      register: mnode
-    - debug:
-        var: mnode.instances
-      tags: print
+    roles:
+      - check
+      - role: delete # when undo=true. end play
 
-    - name: delete {{type}} node
-      when: 
-        - undo==true
-        - item.state.name == "running"
-      ec2:
-        region: '{{region}}'
-        state: 'absent'
-        instance_ids: '{{item.instance_id}}'
-      with_items: "{{ mnode.instances }}"
+      - role: findami
 
-    - meta: end_play
-      when: undo == true
+      - { role: createvm, vars: { insttype: "t2.medium" } }
 
-    - name: Find right AMI
-      when: 
-        - (mnode.instances[0] is not defined) or (mnode.instances[0] is defined and mnode.instances[0].state.name !="running")
-      ec2_ami_info:
-        filters:
-          name: "Fedora-Cloud-Base-33-*x86_64*hvm*gp2*"
-      register: ami_find
+      - { role: saveip, vars: { path: "/etc/ansible/hosts" } }
 
-    - name: ami image print
-      debug:
-        var: ami_find.images[0]
-      tags: print
-      when: ami_find.images[0] is defined
+      - role: no-src-dst-check
 
-    - name: Create & Start instance of above AMI
-      ec2:
-        key_name: kp-ncal-ramanjaneyu
-        instance_type: t2.medium
-        region: '{{region}}'
-        image: '{{ami_find.images[0].image_id}}'
-        wait: yes
-        count: "{{inst_count}}"
-        volumes:
-        - device_name: /dev/sda1
-          volume_size: 25
-          delete_on_termination: yes
-        instance_tags:
-          group: k8s-cluster
-          nodetype: "{{type}}"
-      register: ec2_inst_var
-      tags: create-{{type}}
-      when: ami_find.images[0] is defined
-
-    - name: instance details print
-      debug:
-        var: ec2_inst_var
-      tags: ['create-{{type}}','print']
-    - shell: echo '[{{type}}]' >>  /etc/ansible/hosts
-      tags: save-ip
-    - shell: | 
-        echo '{{item.public_ip}}' >>  /etc/ansible/hosts
-      with_items: '{{ec2_inst_var.instances}}'
-      tags: save-ip
-    - local_action: shell aws ec2 modify-instance-attribute --instance-id='{{item.id}}' --no-source-dest-check
-      with_items: '{{ec2_inst_var.instances}}'

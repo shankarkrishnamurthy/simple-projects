@@ -1,0 +1,13 @@
+---
+    - name: delete {{type}} node
+      when: 
+        - undo==true
+        - item.state.name == "running"
+      ec2:
+        region: '{{region}}'
+        state: 'absent'
+        instance_ids: '{{item.instance_id}}'
+      with_items: "{{ mnode.instances }}"
+
+    - meta: end_play
+      when: undo == true

@@ -1,0 +1,3 @@
+---
+      - local_action: shell aws ec2 modify-instance-attribute --instance-id='{{item.id}}' --no-source-dest-check
+        with_items: '{{ec2_inst_var.instances}}'

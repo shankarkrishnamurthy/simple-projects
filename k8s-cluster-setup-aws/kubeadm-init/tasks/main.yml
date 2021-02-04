@@ -1,0 +1,10 @@
+---
+      - name: start kubeadm
+        shell: kubeadm init --pod-network-cidr=10.244.0.0/16
+        tags: init-kubeadm,post-reboot
+
+      - shell: 
+          cmd: grep KUBECONFIG ~/.bashrc || echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >> ~/.bashrc
+        tags: export-kubeconfig,post-reboot 
+
+

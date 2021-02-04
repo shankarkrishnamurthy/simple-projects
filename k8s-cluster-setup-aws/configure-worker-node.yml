@@ -1,5 +1,5 @@
 ---
-  - name: play 1
+  - name: play 2
     hosts: worker
     gather_facts: false
     remote_user: fedora
@@ -11,76 +11,16 @@
       ansible_python_interpreter: /bin/env python
       joincmd: "{{ lookup('file', 'worker-join.cmd') }}"
 
-    tasks:
-      - name: wait for conn
-        wait_for_connection:
-          timeout: 60
-
-      - name: Set kernel cmdline for docker
-        shell:
-          cmd: grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
-
-      - name: netfilter set
-        modprobe:
-          name: br_netfilter
-          state: present
-
-      - name: set sysctl for br iptables
-        shell:
-          cmd: |
-            cat <<EOF | tee /etc/sysctl.d/k8s.conf
-            net.bridge.bridge-nf-call-ip6tables = 1
-            net.bridge.bridge-nf-call-iptables = 1
-            EOF
-      - shell: sysctl --system
-      #- shell: setenforce 0 
-        #ignore_errors: yes
-      - shell: sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
-
-      - shell:
-          cmd: |
-            cat <<EOF | tee /etc/yum.repos.d/kubernetes.repo
-            [kubernetes]
-            name=Kubernetes
-            baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
-            enabled=1
-            gpgcheck=1
-            repo_gpgcheck=1
-            gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
-        tags: repo   
-
-      - name: Install packages
-        yum:
-          name: '{{ item }}'
-          state: present
-        with_items:
-          - kubelet
-          - kubeadm
-          - kubectl 
-          - docker
-          - kubernetes-cni
-        tags: install
-
-      - shell:
-          cmd: |
-            cat <<EOF | tee /etc/systemd/network/50-flannel.link
-            [Match]
-            OriginalName=flannel*
-            [Link]
-            MACAddressPolicy=none 
-        tags: flannel-fix
-
-      - shell: systemctl enable --now docker
-      - shell: systemctl enable --now kubelet
-      - reboot:
-          reboot_timeout: 60
-        tags: reboot
-      - shell:
-          cmd: '{{joincmd.0}}'
-        tags: joincmd,post-reboot
-      - copy:
-          src: /home/fedora/.ssh/authorized_keys
-          dest: /root/.ssh
-          remote_src: yes
-        tags: copy-key,post-reboot
+    roles:
+      - { role: waitforconn, vars: { tout : 60 } }
+      - { role: setgrubline }
+      - { role: setnetfilter }
+      - { role: setsysctlbr }
+      - { role: disable-selinux }
+      - { role: install-kubernetes }
+      - { role: fix-flannel-bug }
+      - { role: enable-services }
+      - { role: rootsshkey }
+      - { role: reboot }
+      - { role: runjoin }
 

@@ -1,0 +1,10 @@
+---
+    - name: check for {{type}}
+      ec2_instance_info:
+        filters:
+          "tag:nodetype": "{{type}}"
+      register: mnode
+    - debug:
+        var: mnode.instances
+      tags: print
+

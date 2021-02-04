@@ -4,74 +4,20 @@
     hosts: localhost
     gather_facts: false
     vars:
-      region: 'us-west-2'
+      region: 'us-west-1'
       undo: false
+      type: "master"
+      inst_count: 1
 
-    tasks:
-    - name: check for master
-      ec2_instance_info:
-        filters:
-          "tag:nodetype": master
-      register: mnode
-    - debug:
-        var: mnode.instances
-      tags: print
+    roles:
+      - check
+      - role: delete # when undo=true. end play
 
-    - name: delete master node
-      when: 
-        - undo==true
-        - item.state.name == "running"
-      ec2:
-        region: '{{region}}'
-        state: 'absent'
-        instance_ids: '{{item.instance_id}}'
-      with_items: "{{ mnode.instances }}"
+      - role: findami
 
-    - meta: end_play
-      when: undo == true
+      - { role: createvm, vars: { insttype: "t2.medium" } }
 
-    - name: Find right AMI
-      when: 
-        - (mnode.instances[0] is not defined) or (mnode.instances[0] is defined and mnode.instances[0].state.name !="running")
-      ec2_ami_info:
-        filters:
-          name: "Fedora-Cloud-Base-33-*x86_64*hvm*gp2*"
-      register: ami_find
-      tags: find-ami
+      - { role: saveip, vars: { path: "/etc/ansible/hosts" } }
 
-    - name: ami image print
-      debug:
-        var: ami_find.images[0]
-      tags: print,find-ami
-      when: ami_find.images[0] is defined
+      - role: no-src-dst-check
 
-    - name: Create & Start instance of above AMI
-      ec2:
-        key_name: kp-ncal-ramanjaneyu
-        instance_type: t2.medium
-        region: '{{region}}'
-        image: '{{ami_find.images[0].image_id}}'
-        wait: yes
-        count: 1
-        instance_tags:
-          group: k8s-cluster
-          nodetype: master
-      register: ec2_inst_var
-      tags: create-master
-      when: ami_find.images[0] is defined
-
-    - name: instance details print
-      debug:
-        var: ec2_inst_var
-      tags: ['create-master','print']
-    - set_fact:
-        ip: '{{ec2_inst_var.instances[0].public_ip}}'
-      name: set fact to save to file
-    - debug:
-        var: ip
-    - shell: | 
-        echo '[master]
-        {{ip}}' > /etc/ansible/hosts
-      tags: write-ip 
-      name: add instance ip into /etc/ansible/hosts
-    - local_action: shell aws ec2 modify-instance-attribute --instance-id='{{ec2_inst_var.instances[0].id}}' --no-source-dest-check

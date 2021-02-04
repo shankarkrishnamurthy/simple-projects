@@ -1,0 +1,9 @@
+---
+      - name: apply cni
+        shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+        environment:
+            KUBECONFIG: /etc/kubernetes/admin.conf
+        #shell: https://docs.projectcalico.org/manifests/calico.yaml
+        tags: apply-cni,post-reboot
+
+
