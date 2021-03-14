@@ -1,0 +1,128 @@
+---
+swagger: "2.0"
+info:
+  description: "Yet Another Node.js Blogg Application API"
+  version: "1.0.0"
+  title: "Yet Another Node.js Blogg Application API"
+  license:
+    name: "MIT"
+    url: "https://opensource.org/licenses/MIT"
+host: "localhost:3000"
+basePath: "/api/v1"
+tags:
+- name: "Users"
+  description: "API for users in the system"
+schemes:
+- "http"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /users:
+    get:
+      tags:
+      - "Users"
+      summary: "Get all users in system"
+      operationId: "usersGET"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Users"
+      x-swagger-router-controller: "Users"
+    post:
+      tags:
+      - "Users"
+      description: "Create new user in system"
+      operationId: "usersPOST"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "user"
+        description: "User that we want to create"
+        required: false
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        200:
+          description: "New user is created"
+          schema:
+            $ref: "#/definitions/User"
+      x-swagger-router-controller: "Users"
+  /users/{userId}:
+    get:
+      tags:
+      - "Users"
+      summary: "Get user with given ID"
+      operationId: "usersUserIdGET"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "ID of user that we want to find"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "User is found"
+          schema:
+            $ref: "#/definitions/User"
+      x-swagger-router-controller: "Users"
+    put:
+      tags:
+      - "Users"
+      summary: "Update user with give ID"
+      operationId: "usersUserIdPUT"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "ID of user that we want to find"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "user"
+        description: "User with new values of properties"
+        required: false
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        200:
+          description: "User is updated"
+          schema:
+            $ref: "#/definitions/User"
+      x-swagger-router-controller: "Users"
+    delete:
+      tags:
+      - "Users"
+      summary: "Delete user with given ID"
+      operationId: "usersUserIdDELETE"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "ID of user that we want to find"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "User is deleted"
+          schema:
+            $ref: "#/definitions/User"
+      x-swagger-router-controller: "Users"
+definitions:
+  User:
+    required:
+    - "_id"
+    - "email"
+    properties:
+      _id:
+        type: "string"
+      email:
+        type: "string"
+      lastName:
+        type: "string"
+      firstName:
+        type: "string"
+  Users:
+    $ref: "#/definitions/User"

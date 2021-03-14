@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: do-visit-counter-frontend
+  labels:
+    name: do-visit-counter-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: do-visit-counter-frontend
+  template:
+    metadata:
+      labels:
+        app: do-visit-counter-frontend
+    spec:
+      containers:
+        - name: do-visit-counter-frontend
+          image: shankarkrishna/do-visit-counter-frontend:v1
+          imagePullPolicy: Always
+          env:
+            - name: COUNTER_ENDPOINT
+              value: "http://do-visit-counter-backend.default.svc.cluster.local:5000"
+          ports:
+            - name: frontend-port
+              containerPort: 8000
+              protocol: TCP

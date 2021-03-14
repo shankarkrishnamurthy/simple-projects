@@ -1,0 +1,17 @@
+---
+
+    - name: Find right AMI
+      when: 
+        - (mnode.instances[0] is not defined) or (mnode.instances[0] is defined and mnode.instances[0].state.name !="running")
+      ec2_ami_info:
+        filters:
+          name: '{{aminame}}'
+      register: ami_find
+      tags: find-ami
+
+    - name: ami image print
+      debug:
+        var: ami_find.images[0]
+      tags: print,find-ami
+      when: ami_find.images[0] is defined
+

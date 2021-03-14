@@ -1,0 +1,18 @@
+---
+    - set_fact:
+        ip: '{{ec2_inst_var.instances[0].public_ip}}'
+      name: set fact to save to file
+    - debug:
+        var: ip
+    - shell: | 
+        echo '[{{type}}]' >> /etc/ansible/hosts
+      when: type == "worker"
+    - shell: | 
+        echo '[{{type}}]' > /etc/ansible/hosts
+      when: type == "master"
+    - shell: | 
+        echo '{{item.public_ip}}' >> '{{path}}'
+      with_items: '{{ec2_inst_var.instances}}'
+      tags: write-ip 
+      name: add instance ip into '{{path}}'
+

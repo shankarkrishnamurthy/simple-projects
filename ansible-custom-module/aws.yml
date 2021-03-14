@@ -1,0 +1,26 @@
+---
+- name: Create a new Demo EC2 instance
+  hosts: localhost
+  gather_facts: False
+
+  vars:
+      region: us-west-2
+      instance_type: t2.micro
+      ami: ami-0528a5175983e7f28
+      subnetid: subnet-04ce664e297cb19d9
+  
+  tasks:
+
+    - name: Create an ec2 instance
+      ec2:
+         instance_type: "{{ instance_type }}"
+         image: "{{ ami }}"
+         wait: true
+         region: "{{ region }}"
+         vpc_subnet_id: "{{ subnetid }}"
+         assign_public_ip: yes
+         count: 1  # default
+         #key_name: "{{ keypair }}"
+         state: 'absent'
+         instance_ids: 'i-065380b149dcb3d1f'
+      register: ec2

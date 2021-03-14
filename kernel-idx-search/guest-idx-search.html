@@ -1,0 +1,72 @@
+<script src=""></script><!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="jquery.js"></script>
+    <script src="bootstrap.js"></script>
+    <title> Kernel Index Pull </title>
+    <link rel="stylesheet" href="bootstrap.css">
+    <script>
+    
+    function onDataRecv(data) {
+        console.log("Received Data ...");
+        $(".dataarea").innerHTML = "<h3>Starting Links ... </h3>";
+        var ele = document.createElement('html');
+        ele.innerHTML = data.contents;
+        content = ele;
+        var val = ele.getElementsByClassName('IndexEntry');
+        //console.log(val);
+        for (i=0;i<val.length;i++) {
+            $(".dataarea ul").append("<li> " + val[i].innerHTML + "</li>");
+        }
+    }
+    function analyze() {    }
+
+    function search() {
+        var ele = $("#myinstr")[0].value;
+        if (ele.length < 2) {
+            return;
+        }
+        $(".dataarea ul").empty(); // clear the content
+        var val = content.getElementsByClassName('IndexEntry');
+        var pat = ele.split(" ");
+        for (i=0;i<val.length;i++) {
+            for (j=0;j <pat.length;j++) {
+                found = val[i].innerHTML.toLowerCase().search(pat[j].toLowerCase());
+                if (found == -1) {break;}
+            }
+            if (found == -1) {continue;}
+            var attval = val[i].getElementsByTagName('a')[0];
+            attval.setAttribute("href", baseurl+ attval.getAttribute("href"));
+            $(".dataarea ul").append("<li> " + val[i].innerHTML + "</li>");
+        }
+    }
+        
+    var baseurl = "https://lwn.net";
+    var linkpath = "/Archives/GuestIndex/";
+    $(document).ready(function() {
+        var content;
+        var obj;
+
+        // To Get Around CORS problem. 
+        // Allow-Origin header not available
+        var url='https://api.allorigins.ml/get?url=' +
+            encodeURIComponent(baseurl + linkpath) + '&callback=?';
+        $.getJSON(url, onDataRecv);
+    })
+    
+    </script>
+</head>
+
+<body class="container">
+    <div class="reqarea"></div> 
+    <input id="myinstr" onkeyup="analyze()"> </input>
+    <button value="Test" onclick="search()"> Filter</button>
+    <hr>
+    <div class="dataarea">
+    <ul>
+    </ul>
+    </div>
+</body>
+</html>

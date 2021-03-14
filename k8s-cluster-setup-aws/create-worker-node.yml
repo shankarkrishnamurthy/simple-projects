@@ -1,0 +1,23 @@
+---
+
+  - name: play for creating node
+    hosts: localhost
+    gather_facts: false
+    vars:
+      region: 'us-west-1'
+      inst_count: 2
+      type: "worker"
+      undo: false
+
+    roles:
+      - check
+      - role: delete # when undo=true. end play
+
+      - role: findami
+
+      - { role: createvm, vars: { insttype: "t2.medium" } }
+
+      - { role: saveip, vars: { path: "/etc/ansible/hosts" } }
+
+      - role: no-src-dst-check
+

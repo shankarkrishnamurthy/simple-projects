@@ -1,0 +1,5 @@
+---
+      - reboot:
+          reboot_timeout: 90
+        tags: reboot
+      

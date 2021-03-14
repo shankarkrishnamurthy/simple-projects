@@ -1,0 +1,6 @@
+---
+      - shell: kubeadm token create --print-join-command
+        register: joincmd
+        tags: joincmd,post-reboot
+      - local_action: copy content={{joincmd.stdout_lines}} dest='{{filename}}'
+        tags: save-join-cmd,post-reboot

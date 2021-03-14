@@ -1,0 +1,6 @@
+---
+      - name: Set kernel cmdline for docker
+        shell:
+          cmd: grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
+
+

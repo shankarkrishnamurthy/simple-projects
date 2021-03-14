@@ -1,0 +1,3 @@
+---
+      - shell: systemctl enable --now docker
+      - shell: systemctl enable --now kubelet

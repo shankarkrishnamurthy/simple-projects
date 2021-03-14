@@ -1,0 +1,39 @@
+<div class="jumbotron">
+    <h1>
+        <center>Support Package Helper</center>
+    </h1>
+</div>
+<form action="/filter" method="POST">
+    <select name="TYPE">
+        {{#each plt}}
+        <option value="{{this}}">{{this}}</option>
+        {{/each}}
+    </select>
+    <select name="MR">
+        {{#each bld}}
+        <option value="{{this}}">{{this}}</option>
+        {{/each}}
+    </select>
+    <input type="checkbox" id="JIRA" name="JIRA">
+    <label for="JIRA">JiraID</label>
+    <input type="submit" value="Submit">
+    <input type="text" name="SR" placeholder="SR #">
+</form>
+{{#if fpage}}
+
+<input id="Stat" type="submit" style="float: left; margin-left:0px" value="Stats">
+<span id="stat_date">
+ <label for="FD" style="float: left; margin-left:1rem">Date:</label>
+  <input id="FD" type="text" class="datepicker" autocomplete="off" style="float: left; margin:0px; width:6rem;"  />
+  <label for="LD" style="float: left; margin:0px">-</label>
+  <input id="LD" type="text" class="datepicker" autocomplete="off" style="float: left; margin:0px; width:6rem;" /> 
+</span> 
+{{/if}} 
+
+{{#if total}}
+<div style="margin:1rem 0px;margin-bottom:0px;">
+    <h6 class="d-flex display-6 justify-content-end"><i>Total={{total}}</i></h6>
+</div>
+{{/if}}
+<hr style="padding: 0px; margin: 0px;">
+<br>

@@ -1,0 +1,48 @@
+{
+  "builders": [
+    {
+      "accelerator": "kvm",
+      "boot_command": [
+        "<up><wait><tab><wait> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/c7-kvm-ks.cfg<enter><wait>"
+      ],
+      "boot_wait": "40s",
+      "disk_interface": "virtio",
+      "disk_size": "100000M",
+      "format": "qcow2",
+      "headless": true,
+      "host_port_max": 2229,
+      "host_port_min": 2222,
+      "http_directory": ".",
+      "http_port_max": 10089,
+      "http_port_min": 10082,
+      "iso_checksum": "sha256:659691c28a0e672558b003d223f83938f254b39875ee7559d1a4a14c79173193",
+      "iso_url": "http://centos.mirror.garr.it/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-2003.iso",
+      "net_device": "virtio-net",
+      "output_directory": "centos7-base-img",
+      "qemuargs": [
+        [
+          "-m",
+          "2048M"
+        ],
+        [
+          "-smp",
+          "cpus=1,maxcpus=16,cores=4"
+        ]
+      ],
+      "shutdown_command": "shutdown -P now",
+      "ssh_password": "CHANGEME",
+      "ssh_port": 22,
+      "ssh_timeout": "1200s",
+      "ssh_username": "root",
+      "type": "qemu",
+      "vm_name": "centos7-base"
+    }
+  ],
+  "provisioners": [
+    {
+      "command": "touch provisioner-ran",
+      "type": "shell-local"
+    }
+  ]
+}
+

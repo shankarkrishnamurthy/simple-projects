@@ -1,0 +1,6 @@
+---
+      - name: wait for conn
+        wait_for_connection:
+          timeout: '{{tout}}'
+
+

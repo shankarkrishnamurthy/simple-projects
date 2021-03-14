@@ -1,0 +1,11 @@
+.btn-space {
+    margin: 1em;
+}
+.col-space {
+    border-radius: 1em !important;
+}
+.blank_row {
+    height: 10em !important;
+    /* overwrites any other rules */
+    background-color: #FFFFFF;
+}

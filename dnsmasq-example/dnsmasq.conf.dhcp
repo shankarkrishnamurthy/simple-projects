@@ -1,0 +1,29 @@
+interface=localbr
+
+# To disable dnsmasq's DNS server functionality.
+port=0
+
+# To enable dnsmasq's DHCP server functionality.
+dhcp-range=11.11.0.10,11.11.0.100,255.255.255.0,12h
+#dhcp-range=192.168.0.50,192.168.0.150,12h
+
+# Set static IPs of other PCs and the Router.
+#dhcp-host=ac:97:0e:f2:6f:ab,yul-x230,192.168.0.13,infinite  # PC2
+
+# Set gateway as Router. Following two lines are identical.
+#dhcp-option=option:router,192.168.0.1
+#dhcp-option=3,11.11.0.1
+dhcp-option=3
+except-interface=lo
+bind-dynamic
+dhcp-no-override
+dhcp-authoritative
+ra-param=*,0,0
+strict-order
+
+
+# Logging.
+log-facility=/var/log/dnsmasq.log   # logfile path.
+log-async
+log-queries # log queries.
+log-dhcp    # log dhcp related messages.

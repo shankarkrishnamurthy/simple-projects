@@ -1,0 +1,22 @@
+{
+  "name": "yet-another-node/js-blogg-application-api",
+  "version": "1.0.0",
+  "description": "Yet Another Node.js Blogg Application API",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm install",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "swagger"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "dependencies": {
+    "connect": "^3.7.0",
+    "http": "0.0.1-security",
+    "js-yaml": "^3.14.0",
+    "swagger-tools": "^0.10.4",
+    "swagger-ui": "^3.36.2"
+  }
+}

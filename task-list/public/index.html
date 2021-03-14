@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/custom.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="jumbotron">
+        <h1> 
+            <center>Task List Organizer    </center>
+        </h1>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="container-fluid">
+                    <input type="text" class="form-control" id="searchtext">
+                    <span class="glyphicon glyphicon-ok creategly"></span>
+                    <span class="glyphicon glyphicon-search searchgly"></span>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="container-fluid">
+                    <div class="col-md-4">
+                        <button class="btn btn-info btn-block myactive" type="button">
+                            Done</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-info btn-block mydone" type="button">
+                            Active</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-info btn-block mycollapse" type="button">
+                            StartOver</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        
+        <div class="container-fluid">
+            <ul class="list-group cTaskList">
+                <!-- Task Getting added here -->
+            </ul>
+            <br>
+            <div>
+                <img src="img/ajax-loading-gif-3.gif" class="imgmore"></img>
+                <i class="glyphicon glyphicon-repeat taskmore"></i>
+            </div>
+        </div>
+    </div>
+       
+    <!--Keep content above this-->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/app-fe.js"></script>
+</body>
+</html>

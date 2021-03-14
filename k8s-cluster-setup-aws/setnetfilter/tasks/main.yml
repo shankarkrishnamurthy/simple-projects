@@ -1,0 +1,7 @@
+---
+      - name: netfilter set
+        modprobe:
+          name: br_netfilter
+          state: present
+
+

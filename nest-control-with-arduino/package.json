@@ -1,0 +1,15 @@
+{
+  "name": "nest-control-with-arduino",
+  "version": "1.0.0",
+  "description": "",
+  "main": "thermo-read.js",
+  "dependencies": {},
+  "devDependencies": {
+    "request": "^2.88.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

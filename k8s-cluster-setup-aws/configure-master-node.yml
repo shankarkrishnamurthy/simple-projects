@@ -1,0 +1,27 @@
+---
+  - name: play 1
+    hosts: master
+    gather_facts: false
+    remote_user: fedora
+    become_method: sudo
+    become: yes
+    become_user: root
+    vars:
+      ansible_ssh_private_key_file: /root/kp-ncal-ramanjaneyu.pem
+      ansible_python_interpreter: /bin/env python
+
+    roles:
+      - { role: waitforconn, vars: { tout : 60 } }
+      - { role: setgrubline }
+      - { role: setnetfilter }
+      - { role: setsysctlbr }
+      - { role: disable-selinux }
+      - { role: install-kubernetes }
+      - { role: fix-flannel-bug }
+      - { role: enable-services }
+      - { role: rootsshkey }
+      - { role: reboot }
+      - { role: kubeadm-init } # updates  bashrc
+      - { role: apply-cni }
+      - { role: jointoken , vars: { filename : "worker-join.cmd" }}
+      

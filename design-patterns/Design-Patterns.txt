@@ -1,0 +1,168 @@
+Creational:
+===========
+Factory:
+    (shapeFactory defines 'circle' and 'square')
+    from factory import shapeFactory
+    f = shapeFactory()
+    s = f.getShape('square')
+    s
+    s.draw()
+    t = f.getShape('triangle')
+    <error>
+
+Builder:
+    from builder import JeepBuilder,NissanBuilder,Director
+    d=Director()
+    d.setBuilder(JeepBuilder())
+    d.getCar()
+    ...
+    d.getCar().specification()
+    ...
+    d2 = Director()
+    d2.setBuilder(NissanBuilder())
+    d2.getCar().specification()
+    ...
+
+Singleton/Borg:
+    x = Singleton()
+    x.val = 'burger'
+    x.val
+    ...
+    y = Singleton()
+    y.val
+    ...
+    x.val
+    ...
+
+    b=Borg()
+    c = Borg()
+    b == c
+    ...
+    b.val ='shake'
+    c.val
+    ...
+
+Structural:
+===========
+
+Facade:
+    from facade import Car
+    c = Car()
+    c.turn_key()
+    ...Engine not started
+    c.jump()
+    ...jumped
+    c.turn_key()
+    ...Engine started!
+
+Proxy:
+    from proxy_1 import Proxy,RealSubject
+    rs = RealSubject()
+    rs.request()
+    ...the real thing responding
+    proxy = Proxy(rs)
+    proxy.request()
+    ...proxy doing its thing
+    ...the real thing respoinding
+    from proxy_2 import Blog,AnonUserBlogProxy
+    blog = Blog()
+    blog.write()
+    ...write the blog
+    proxy = AnonUserBlogProxy(blog)
+    proxy.write()
+    ...only authorized users can write blog
+
+Decorator:
+    from decorator import Window,BorderDecorator,VerticalSBDecorator,HorizontalSBDecorator
+    w = window()
+    w.build()
+    ... Building window
+    wb = BorderDecorator(w)
+    wb.build()
+    ...Adding border
+    ...Buidling window
+    vwb = VerticalSBDecorator(wb)
+    vwb.build()
+    ...Adding Vertical SB Deco
+    ...Adding Border
+    ...Building window
+    best_win = HorizontalSBDecorator(vwb)
+    best_win.build()
+    ...Adding Horizongal scroll bar
+    ...Adding Verical SB Deco
+    ...Adding border
+    ...Building window
+
+Adapter:
+    
+    from adapter import EuropeanSocket,AmericanKettle,Adapter
+    socket = Europeansocket()
+    kettle = AmericanKettle(socket)
+    kettle.boil()
+    ...kettle on fire!
+    adapter = Adapter(socket)
+    kettle = AmericanKettle(adapter)
+    kettle.boil()
+    ...Coffee time!
+
+Behavioral:
+===========
+
+Command:
+
+    from command import Screen,ScreenInvoker, Cutcommand,PasteCommand
+    screen = Screen('hello world!')
+    screen.__str__()
+    ...hello world!
+    cut = Cutcommand(screen, start=5,end=11)
+    client = ScreenInvoker()
+    client.store_and_execute(cut)
+    screen.__str__()
+    ...hello
+    paste = Pastecommand(screen, offset=0)
+    client.store_and_execute(paste)
+    screen.__str__()
+    ...worldhello!
+    client.undo_last()
+    client.undo_last()
+    screen.__str__()
+    ...hello world!
+
+State:
+
+    from state import Computer, On, Off, Suspend, Hibernate
+    c = Computer()
+    c.state.__str__()
+    c.change(On)
+    ...Current: Off => switch to new state On
+    c.change(suspend)
+    ...Current: on => switch to new state suspend
+    c.change(Hibernate)
+    ...Current: suspend => swithc to new state hibernate : not possible
+
+Chain of Responsibility:
+
+    from chain import Car, OilHandler, FuelHandler, WaterHandler
+    garage_handler = OilHandler(FuelHandler(WaterHandler()))
+    car = Car('my car', 1,1,1)
+    garage_handler.handle_request(car)
+    ...Added Oil
+    ...Added Fuel
+    ...Added Water
+    ...Car is good to go
+    car = Car('another car', 12,12,12)
+    garage_handler.handle_request(car)
+
+Observer:
+
+    from observer import Observable, AmericanStockMarket,EuropeanStockMarket
+    big_company = Observable()
+    us = AmericanStockMarket()
+    big_company.register(us)
+    euro = EuropeanStockMarket()
+    big_company.register(euro)
+    big_company.update_observers('important update',msg='ceo got kicked out')
+
+    ... american stock market received msg ...
+    ... european stock market received msg ...
+

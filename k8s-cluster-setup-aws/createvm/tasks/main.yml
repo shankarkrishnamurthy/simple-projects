@@ -1,0 +1,21 @@
+---
+    - name: Create & Start instance of above AMI
+      ec2:
+        key_name: kp-ncal-ramanjaneyu
+        instance_type: '{{insttype}}'
+        region: '{{region}}'
+        image: '{{ami_find.images[0].image_id}}'
+        wait: yes
+        count: "{{inst_count}}"
+        instance_tags:
+          group: k8s-cluster
+          nodetype: "{{type}}"
+      register: ec2_inst_var
+      tags: create-{{type}}
+      when: ami_find.images[0] is defined
+
+    - name: instance details print
+      debug:
+        var: ec2_inst_var
+      tags: ['create-{{type}}','print']
+

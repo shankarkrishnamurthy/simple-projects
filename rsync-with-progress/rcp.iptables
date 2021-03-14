@@ -1,0 +1,104 @@
+#!/bin/env python
+from multiprocessing import *
+import subprocess
+import time
+import os,sys
+import signal
+import re
+
+#assumes ssh keys are set
+user,ip = 'root','10.217.203.54'
+prog = '/usr/bin/rsync'
+
+def rsync(srcp,dstp):
+    # Find Total Bytes to transmit
+    args = ' -q -az --no-o --no-g '
+    cmd = prog + args + srcp + dstp 
+    print cmd
+    os.system(cmd)
+
+def inthandler(c,f):
+    print 'User Terminated. Exiting.'
+    remove_iptable_insert()
+    sys.exit(0)
+
+def do_rsync_dryrun(srcp,dstp):
+    args = ' --dry-run --stats -az --no-o --no-g '
+    cmd = prog + args + srcp + dstp 
+    s1 = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    s2 = subprocess.Popen(['grep',"Total transferred file size"], stdin=s1.stdout, stdout=subprocess.PIPE)
+    out,err = s2.communicate()
+    #print out
+    val, rc, _ = -1, s2.wait(),s1.wait()
+
+    if rc != 0:
+        print 'rsync failed. cannot get transfer size'
+        os.exit(1)
+    m = re.search(': (\d+) bytes', out)
+    if m: val = m.group(1)
+    if val == -1:
+        print 'rsync failed. cannot get transfer bytes'
+        os.exit(1)
+        
+    return int(val)
+
+def do_iptable_insert():
+    os.system('sudo iptables -A OUTPUT -p tcp -d 10.217.203.54 -s 10.217.203.50 --dport 22')
+
+def remove_iptable_insert():
+    os.system('sudo iptables -D OUTPUT 1')
+    pass
+
+def get_bytes_sent():
+    cmd="sudo iptables -v -L OUTPUT -n --line-number -x"
+    s1 = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    out, err = s1.communicate()
+    rc = s1.wait()
+    if rc != 0:
+        print 'rsync failed. cannot get iptables output'
+    #print out
+    m = re.search('1\s+\d+\s+(\d+)',out)
+    if m:
+        return int(m.group(1))
+    else:
+        return -1
+
+
+def do_rsync(srcp,dstp):
+    signal.signal(signal.SIGINT, inthandler)
+
+    print 'Calculating bytes to transfer ...',
+    val = do_rsync_dryrun(srcp,dstp)
+    print val
+    if val == 0:
+        print 'Nothing to Transfer. Exiting.'
+        sys.exit(0)
+
+    do_iptable_insert()
+    
+    p1 = Process(target=rsync, args=(srcp,dstp,))
+    p1.start()
+
+    while p1.is_alive(): 
+        cur = get_bytes_sent()
+        if cur != -1:
+            time.sleep(1)
+            sys.stdout.write('\rCompleted: %.2f %%  (%d/%d) ' % ((round(float(cur)/float(val)*100.0,2)), cur, val))
+            sys.stdout.flush()
+        else:
+            time.sleep(1)
+            sys.stdout.write('\rIn Progress ...')
+            sys.stdout.flush()
+
+    print
+    remove_iptable_insert()
+
+if __name__ == "__main__":
+    cpath = os.environ['P4CLIENT']
+    if not cpath:
+        print 'Not in p4 client. Exiting.'
+        sys.exit(0)
+    srcpath = "/work/" + cpath  + "/ "
+    dstpath = user + '@' + ip + ':' + srcpath
+    do_rsync(srcpath,dstpath)
+    sys.exit(0)

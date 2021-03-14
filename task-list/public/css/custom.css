@@ -1,0 +1,154 @@
+/*Common Rules*/
+#searchtext {
+    display: inline-block;
+    width: 80%;
+    margin-bottom: 1em;
+}
+
+.searchgly, .creategly {
+    font-size:1.5em;
+    margin-left: .5em;
+    margin-right: .5em;
+    margin-bottom: 1em;
+    height: 1.5em;
+    cursor: pointer;
+}
+
+.taskmore {
+    font-size: 3em;
+    display: block;
+    text-align: center;
+    cursor: pointer;
+}
+
+.imgmore {
+    height: 7%;
+    width: 7%;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.list-group-item {
+    margin: .5em;
+}
+
+.btn {
+    padding: .5em 0em;
+}
+
+hr {
+    height: 2px;
+    background-color: #333; /* Modern Browsers */
+}
+
+body {
+    overflow-wrap: break-word;
+}
+
+/*Tablet rules*/
+@media only screen and (max-width: 850px) and (min-width: 501px)  {
+    .tasktext {
+        margin-left: 2em;
+        display: inline-block;
+        width: 75%;
+    }
+    .taskgly {
+        font-size:1.5em;
+        margin-left: .5em;
+        margin-right: .5em;
+        display: inline-block;
+        float:right;
+    }
+    .taskgly:hover {
+        cursor: pointer;
+    }
+    .mycheck {
+        display: block;
+        float: left;
+    }
+}
+
+/* large desktop media */
+@media only screen and (min-width: 1201px)  {
+    .container {
+        width: 90%;
+    }
+    .tasktext {
+        margin-left: 2em;
+        display: inline-block;
+        width: 85%;
+    }
+
+    .taskgly {
+        font-size:1.5em;
+        margin-left: .5em;
+        margin-right: .5em;
+        display: inline-block;
+        float:right;
+    }
+    .taskgly:hover {
+        cursor: pointer;
+    }
+    .mycheck {
+        display: block;
+        float: left;
+    }
+}
+
+/* small Desktop Rules*/
+@media only screen and (min-width: 851px) and (max-width: 1200px) {
+    .container {
+        width: 95%;
+    }
+    .tasktext {
+        margin-left: 2em;
+        display: inline-block;
+        width: 85%;
+    }
+
+    .taskgly {
+        font-size:1.5em;
+        margin-left: .5em;
+        margin-right: .5em;
+        display: inline-block;
+        float:right;
+    }
+    .taskgly:hover {
+        cursor: pointer;
+    }
+    .mycheck {
+        display: block;
+        float: left;
+    }
+}
+
+/*Mobile Rules*/
+@media only screen and (max-width: 500px) {
+    .list-group-item {
+        overflow: auto;
+    }
+    .mycheck {
+        display: inline-block;
+        float: left;
+        width: 1.5em; height: 1.5em;
+        margin-left: 2em;
+    }
+
+    .tasktext {
+        margin-left: 2em;
+        display: block;
+        float: right;
+        width:75%;
+    }
+    .taskgly:hover {
+        cursor: pointer;
+    }
+    .taskgly {
+        font-size:1.5em;
+        margin-top:1em;
+        display: inline-block;
+        float: left;
+        clear:left;
+    }
+}

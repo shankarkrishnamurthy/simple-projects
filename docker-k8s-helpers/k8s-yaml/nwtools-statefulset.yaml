@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nwtools
+  labels:
+    app: nwtools-statefulset
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: nwtools
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nwtools-1
+  labels:
+    app: nwtools-statefulset
+spec:
+  ports:
+  - port: 80
+  clusterIP: None
+  selector:
+    statefulset.kubernetes.io/pod-name: nwtools-1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nwtools-2
+  labels:
+    app: nwtools-statefulset
+spec:
+  ports:
+  - port: 80
+  clusterIP: None
+  selector:
+    statefulset.kubernetes.io/pod-name: nwtools-2
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nwtools
+spec:
+  serviceName: "nwtools"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nwtools
+  template:
+    metadata:
+      labels:
+        app: nwtools
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: nwtools
+        image: shankarkrishna/nwtools
+        ports:
+        - containerPort: 80
+          name: nwtools
+        command:
+        - nc
+        - -k
+        - -l
+        - "80"
