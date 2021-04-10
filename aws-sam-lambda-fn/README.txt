@@ -11,7 +11,7 @@
     3. Create role
         - <ac>:role/myLambdaRole
             - with 'Trust relationship' = lambda.amazonaws.com
-            - with Permissions = AmazonEC2FullAccess
+            - with Permissions = AmazonEC2FullAccess,AWSLambdaBasicExecutionRole
     4. sam local invoke --no-event --debug # run lambda function locally
     5. sam local start-api      # start api gateway locally
 
